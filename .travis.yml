@@ -1,6 +1,22 @@
 language: node_js
 node_js: 10
-cache: npm
+cache:
+  directories:
+    - node_modules
 script:
   - npm run build
   - npm test
+before_deploy:
+  - pip install awscli
+  - export PATH=$PATH:$HOME/.local/bin
+  - aws s3 rm s3://$S3_BUCKET --recursive --region=$S3_REGION
+deploy:
+  provider: s3
+  access_key_id: $AWS_ACCESS_KEY_ID
+  secret_access_key: $AWS_SECRET_ACCESS_KEY
+  bucket: $S3_BUCKET
+  skip_cleanup: true
+  region: $S3_REGION
+  local_dir: build
+  on:
+    branch: master
