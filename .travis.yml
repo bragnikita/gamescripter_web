@@ -6,9 +6,11 @@ cache:
 script:
   - npm run build
   - npm test
+env:
+  global:
+    - PATH=$HOME/.local/bin:$PATH
 before_deploy:
-  - pip install awscli
-  - export PATH=$PATH:$HOME/.local/bin
+  - pip install --user awscli
   - aws s3 rm s3://$S3_BUCKET --recursive --region=$S3_REGION
 deploy:
   provider: s3
