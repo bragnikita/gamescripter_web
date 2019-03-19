@@ -1,0 +1,50 @@
+.app {
+  &.users_screen {
+    min-width: 300px;
+  }
+}
+.itemlist {
+  &.item {
+    display: flex;
+    justify-content: stretch;
+    align-items: stretch;
+    padding: 0.6em;
+
+
+    .avatar {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+    }
+
+    .content {
+      flex-grow: 1;
+      cursor: pointer;
+      overflow: hidden;
+      overflow-wrap: break-word;
+    }
+
+    .actions {
+
+    }
+  }
+}
+
+.app {
+  &.form-inline {
+    display: flex;
+    flex-wrap: wrap;
+
+    & > * {
+      margin-right: 0.5em;
+      &:last-child {
+        margin-right: inherit;
+      }
+    }
+
+    & > .app.textfield {
+      max-width: 180px;
+    }
+  }
+}

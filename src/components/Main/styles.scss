@@ -1,0 +1,31 @@
+$top_header_height: 4em;
+.top {
+  &.app-container {
+    height: 100%;
+  }
+  &.content-layout {
+    position: absolute;
+    top: $top_header_height;
+    bottom: 0;
+    width: 100%;
+    display: flex;
+    overflow-x: auto;
+  }
+  &.top_menu_margin {
+    top: $top_header_height;
+  }
+
+  &.screen_patterns {
+    height: 100%;
+    &.basic  {
+      padding: 2em 1.5em;
+      flex-grow: 1;
+    }
+    &.narrow {
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+  }
+}
+
