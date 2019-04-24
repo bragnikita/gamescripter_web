@@ -1,9 +1,9 @@
 import React from "react";
 import {Checkbox, Dropdown, DropdownItemProps, Input, TextArea as Text} from "semantic-ui-react";
 import {FieldState} from "formstate";
-import {observer} from "mobx-react";
+import {observer} from "mobx-react-lite";
 import './formstate_components.scss';
-import {AsyncSubStore} from "../../stores/types";
+import {AsyncSubStore, Vector} from "../../stores/types";
 import classNames from "classnames";
 
 interface TextFieldProps {
@@ -20,7 +20,7 @@ export const TextField = observer(({
                                        password = false, label, name, wrapperClass, displayErrors = true, required = false, fieldState
                                    }: TextFieldProps) => {
 
-    return <div className={classNames('app textfield', wrapperClass)}>
+    return <div className={classNames('app form-component textfield', wrapperClass)}>
         <FieldLabel label={label} required={required}/>
         <Input type={password ? 'password' : 'text'}
                fluid
@@ -39,7 +39,7 @@ export const TextArea = observer(({
                                       label, name, wrapperClass, displayErrors = true, required = false, fieldState
                                   }: TextFieldProps) => {
 
-    return <div className={`mbv_textarea ${wrapperClass || ''}`}>
+    return <div className={`mbv_textarea app form-component ${wrapperClass || ''}`}>
         <FieldLabel label={label} required={required}/>
         <Text type="text"
                required={required}
@@ -79,6 +79,7 @@ interface SyncSelectorProps<T> {
 export const SyncSelector = observer(<T extends any>(props: SyncSelectorProps<T>) => {
     const {options, state} = props;
     return <Dropdown selection
+                     className={"app form-component"}
                      options={options}
                      value={state.value as any}
                      onChange={(e, {value}) => state.onChange(value as any)}
@@ -90,7 +91,7 @@ export interface AsyncSelectorProps<Obj> {
     label?: string,
     required?: boolean,
 
-    optsStore: AsyncSubStore<Obj>,
+    optsStore: Vector<Obj>,
 
     optToValue(opt: Obj): any,
 
@@ -129,12 +130,12 @@ const FieldError = observer(({state, displayError=true}: { state: FieldState<any
 
 export const FormStateAsyncSelector = observer(<K extends {}, Key>(props: AsyncSelectorProps<K>) => {
     const {label, required = false, state, optToValue, optToText, optsStore} = props;
-    const hasValue = !optsStore.fetching && !optsStore.error;
-    const opts = hasValue ? buildOptions(optsStore.items, optToValue, optToText) : [];
-    return <div>
+    const hasValue = !optsStore.loading && !optsStore.error;
+    const opts = hasValue ? buildOptions(optsStore.vector, optToValue, optToText) : [];
+    return <div className={"app form-component"}>
         <FieldLabel label={label} required={required}/>
         <Dropdown selection
-                  loading={optsStore.fetching}
+                  loading={optsStore.loading}
                   error={!!optsStore.error || state.hasError}
                   value={state.value}
                   options={opts}

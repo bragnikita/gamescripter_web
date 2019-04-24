@@ -39,7 +39,18 @@ export class UsersApi extends Base {
 export class CategoriesApi extends Base {
     update = async (id: string, json: any) => await this.http.putJson(`/category/${id}`, json);
     create = async (json: any) => await this.http.postJson(`/categories`, json);
+    fetch = async (id: string) => {
+        if (id) {
+            return await this.http.getJson(`/category/${id}`);
+        } else {
+            return await this.http.getJson('/categorty/root');
+        }
+    };
     getParents = async(childId: string) => await this.http.get(`/category/${childId}/parents`);
+}
+
+export class DictionariesApi extends Base {
+    getAll = async() => await this.http.getJson("/dictionaries")
 }
 
 export class ScriptsApi {

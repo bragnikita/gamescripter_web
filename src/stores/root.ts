@@ -1,9 +1,15 @@
 import {AccountStore} from "./account";
 import {UsersStore} from "./users";
+import CategoriesStore from "./categories";
+import {DictionariesStore} from "./dictionaries";
+import {UiState} from "./uistate";
 
-interface IRootStore {
+export interface IRootStore {
     account: AccountStore,
     users: UsersStore,
+    categories: CategoriesStore,
+    dictionaries: DictionariesStore,
+    ui: UiState,
 }
 
 let singletonInstance: IRootStore;

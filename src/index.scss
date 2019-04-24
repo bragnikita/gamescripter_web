@@ -21,3 +21,51 @@ code {
 #root {
   @extend .prevent-top-collapsing;
 }
+
+.app {
+  &.form-inline {
+    display: flex;
+    & > * {
+      margin-left: 1rem;
+      &:last-child {
+        margin-left: 0;
+      }
+    }
+  }
+  &.form-component {
+
+  }
+  &.form-wrapper {
+    & > .form-component {
+      width: 100%;
+      margin-bottom: 1rem;
+    }
+  }
+
+  &.form-buttons {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    & > * {
+      margin-left: 1em;
+      &:last-child {
+        margin-left: 0;
+      }
+    }
+  }
+  &.form-buttons-right {
+    @extend .form-buttons;
+    justify-content: flex-end;
+  }
+}
+
+.app {
+  &.vcenter {
+    display: flex;
+    align-items: center;
+  }
+  &.hcenter {
+    display: flex;
+    justify-content: center;
+  }
+}

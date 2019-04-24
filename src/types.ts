@@ -1,5 +1,7 @@
 import uri from 'urijs';
 import {Response} from 'superagent';
+import {IRootStore} from "./stores/root";
+import {Params, State} from "router5/types/types/base";
 
 export type AppURI = uri.URI;
 
@@ -63,3 +65,17 @@ export interface RequireHttpGet {
     get(url: string, search?: any, options?: HttpRequestOptions): Promise<Response>;
 }
 export type RequestConfirmation = (message: string) => Promise<any>;
+
+export interface AppRoute {
+    name: string,
+    path: string,
+
+    comp: React.ReactNode,
+
+    activate(params: Params, prevState?: State):void
+    deactivate(params: Params, nextState: State): void
+}
+
+export interface AppRoutingMap {
+    [key: string]: AppRoute,
+}

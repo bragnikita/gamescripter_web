@@ -17,6 +17,12 @@ import {AccountStore} from "./stores/account";
 import AppServices, {AppServicesHolder} from "./services";
 import HttpServiceBackend from "./services/httpService";
 import {UsersStore} from "./stores/users";
+import CategoriesStore from "./stores/categories";
+import {CategoriesApi} from "./api/resource_apis";
+import {DictionariesStore} from "./stores/dictionaries";
+import {UiState} from "./stores/uistate";
+import {makeMobxRouter} from "./routing";
+import routes from "./routes";
 
 const notificationService = new SimpleNotificationService;
 
@@ -43,6 +49,9 @@ servicesHolder.notification = notificationService;
 setAppStore({
     account: new AccountStore(clientInstance),
     users: new UsersStore(clientInstance),
+    categories: new CategoriesStore(new CategoriesApi(clientInstance)),
+    dictionaries: new DictionariesStore(),
+    ui: new UiState(),
 });
 
 // For easier debugging with Chrome Dev Tools
@@ -51,13 +60,22 @@ if (process.env.NODE_ENV === 'development') {
     (window as any)['__SERVICES__'] = AppServices;
 }
 
+const router = makeMobxRouter(routes, getStore());
+router.start();
+
 class App extends Component {
     render() {
         return (
             <Router history={history}>
                 <React.Fragment>
                     <ContentArea/>
-                    <DevTools/>
+                    <DevTools
+                        position={
+                            {
+                                top: -2,
+                                right: 200,
+                            }}
+                    />
                     <NotificationSystem ref={(ref: NotificationSystem.System) => notificationService.setRef(ref)}/>
                 </React.Fragment>
             </Router>

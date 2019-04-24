@@ -4,6 +4,7 @@ import Login from "../Login";
 import AdminHeader from "../AdminHeader";
 import './styles.scss';
 import {UsersManagementScreen} from "../Users";
+import {CategoriesViewScreen} from "../Categories";
 
 export default class ContentArea extends React.Component<any, {}> {
 
@@ -19,7 +20,16 @@ export default class ContentArea extends React.Component<any, {}> {
                         <div className="top content-layout ui extra top_menu_margin">
                             {screenMargins(
                                 <Switch>
-                                    <Route path="/users" render={() => narrow(<UsersManagementScreen/>)}/>
+                                    <Route path="/users"
+                                           render={() => narrow(<UsersManagementScreen/>)}
+                                    />
+                                    <Route path={'/categories/:id'}
+                                           render={({match}) => narrow(<CategoriesViewScreen category_id={match.params['id']}/>)}
+                                    />
+                                    <Route path={'/categories'} exact
+
+                                           render={() => narrow(<CategoriesViewScreen category_id=""/>)}
+                                    />
                                 </Switch>
                             )}
                         </div>
