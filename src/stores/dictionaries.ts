@@ -12,7 +12,7 @@ class Dictionary {
 }
 
 class DictionaryRecord {
-    value: string = '';
+    parameter: string = '';
     title: string = '';
 }
 
@@ -62,6 +62,6 @@ export class DictionariesStore {
         if (!d) {
             return []
         }
-        return d.records.map((d) => ({text: d.title, value: d.value}))
+        return d.records.map((d) => ({text: d.title, value: d.parameter, key: d.parameter}))
     }
 }

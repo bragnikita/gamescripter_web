@@ -25,6 +25,14 @@ export class AccountApi extends Base {
     logout = () => {
         AppServices.token.clear();
     }
+
+    getAccount = async() => {
+        try {
+            return this.http.getJson('/auth/account')
+        } catch (err) {
+            return null;
+        }
+    }
 }
 
 export class UsersApi extends Base {
@@ -43,7 +51,7 @@ export class CategoriesApi extends Base {
         if (id) {
             return await this.http.getJson(`/category/${id}`);
         } else {
-            return await this.http.getJson('/categorty/root');
+            return await this.http.getJson('/category/root');
         }
     };
     getParents = async(childId: string) => await this.http.get(`/category/${childId}/parents`);

@@ -6,7 +6,7 @@ import NotificationSystem from 'react-notification-system';
 import {
     ApiTokenService,
     BrowserLocalStorage,
-    RouterBasedLocationService,
+    Router5BasedLocationSevice,
     SimpleNotificationService
 } from "./services/appservices";
 import ContentArea from "./components/Main";
@@ -21,15 +21,20 @@ import CategoriesStore from "./stores/categories";
 import {CategoriesApi} from "./api/resource_apis";
 import {DictionariesStore} from "./stores/dictionaries";
 import {UiState} from "./stores/uistate";
-import {makeMobxRouter} from "./routing";
-import routes from "./routes";
+import {makeMobxRouter, makeNotLoggedInPlugin} from "./routing";
+import defaultRoutesDefs from "./routes";
+import {reaction} from "mobx";
 
 const notificationService = new SimpleNotificationService;
 
 const routerStore = new RouterStore();
 const browserHistory = createBrowserHistory();
 const history = syncHistoryWithStore(browserHistory, routerStore);
-const navigationService = new RouterBasedLocationService(routerStore);
+
+const ui = new UiState();
+const router = makeMobxRouter(defaultRoutesDefs, ui);
+const navigationService = new Router5BasedLocationSevice(router);
+
 
 const storageService = new BrowserLocalStorage();
 const tokenService = new ApiTokenService("x-access-token", storageService);
@@ -41,18 +46,27 @@ const clientInstance = httpServiceFactory.serviceInstance;
 const servicesHolder = AppServicesHolder.instance();
 
 servicesHolder.http = clientInstance;
-servicesHolder.location = navigationService;
 servicesHolder.storage = storageService;
 servicesHolder.token = tokenService;
 servicesHolder.notification = notificationService;
+servicesHolder.location = navigationService;
 
 setAppStore({
     account: new AccountStore(clientInstance),
     users: new UsersStore(clientInstance),
     categories: new CategoriesStore(new CategoriesApi(clientInstance)),
     dictionaries: new DictionariesStore(),
-    ui: new UiState(),
+    ui: ui,
 });
+
+router.usePlugin(makeNotLoggedInPlugin(() => getStore().account.isLoggedIn));
+router.start();
+
+reaction(() => getStore().account.account, async (user) => {
+    if (!user) return;
+    await getStore().dictionaries.preLoad();
+});
+
 
 // For easier debugging with Chrome Dev Tools
 if (process.env.NODE_ENV === 'development') {
@@ -60,8 +74,6 @@ if (process.env.NODE_ENV === 'development') {
     (window as any)['__SERVICES__'] = AppServices;
 }
 
-const router = makeMobxRouter(routes, getStore());
-router.start();
 
 class App extends Component {
     render() {

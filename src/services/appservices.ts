@@ -6,6 +6,7 @@ import {computed, observable, runInAction} from "mobx";
 import * as NotificationSystem from "react-notification-system";
 import {instanceOf} from "prop-types";
 import {Notification} from "react-notification-system";
+import {Router, State} from "router5";
 
 export class BrowserLocalStorage implements LocalStorageService {
     clear = (key: string): void => {
@@ -52,6 +53,50 @@ export class ApiTokenService implements TokenService {
             this.storage.set(this.tokenName, JSON.stringify(value));
         }
     };
+}
+
+export class Router5BasedLocationSevice implements LocationService {
+    router: Router;
+
+    constructor(router: Router) {
+        this.router = router;
+    }
+
+    get currentUri() {
+        const location = this.router.getState();
+        if (!location) {
+            return new URIJS();
+        }
+        const uriCopy = new URIJS({
+            protocol: window.location.protocol,
+            hostname: window.location.hostname,
+            port: window.location.port,
+            path: window.location.pathname,
+            query: window.location.search,
+        });
+        return uriCopy;
+    }
+
+    push(path: string, query?: any): void {
+        let newStateName;
+        if (path.startsWith('/')) {
+            const newState = this.router.matchPath(path);
+            if (newState) {
+                newStateName = newState.name;
+            }
+        } else {
+            newStateName = path;
+        }
+        if (newStateName) {
+            this.router.navigate(newStateName, query, {})
+        } else {
+            this.router.navigate('not_found')
+        }
+    }
+
+    replace(path: string, query?: any): void {
+    }
+
 }
 
 export class RouterBasedLocationService implements LocationService {
@@ -157,7 +202,7 @@ export class SimpleNotificationService implements Notificator {
         }
     };
 
-    buildNotification = (n: AppNotification):Notification => {
+    buildNotification = (n: AppNotification): Notification => {
         // TODO
         return {
             message: n.text || n.name,

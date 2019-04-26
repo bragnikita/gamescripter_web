@@ -3,46 +3,38 @@ import {Route, Switch} from "react-router";
 import Login from "../Login";
 import AdminHeader from "../AdminHeader";
 import './styles.scss';
-import {UsersManagementScreen} from "../Users";
-import {CategoriesViewScreen} from "../Categories";
+import {observer} from "mobx-react-lite";
+import defaultRoutesDefs from "../../routes";
+import {getStore} from "../../stores/root";
+import {screenMargins} from "../widgets/screens";
+
+const ContentAreaCenter = observer((props: any) => {
+    const currentRoute = getStore().ui.activatedRoute;
+    if (!currentRoute) return null;
+    let route = defaultRoutesDefs.map[currentRoute ? currentRoute.name : 'not_found'];
+    if (!route) {
+        return <div>Route not found</div>
+    }
+    const listener = route.listener;
+    if (listener && listener.comp) {
+        return listener.comp;
+    }
+    return <div>No component for route {route.name} ({route.path})</div>
+});
 
 export default class ContentArea extends React.Component<any, {}> {
 
     render() {
         return <React.Fragment>
-            <Switch>
-                <Route exact path="/login"
-                       render={() => <Login/>}/>
-                <Route path="/editor/:id" render={() => <div>Editor</div>}/>
-                <Route render={() =>
-                    <div className="top app-container">
-                        <AdminHeader/>
-                        <div className="top content-layout ui extra top_menu_margin">
-                            {screenMargins(
-                                <Switch>
-                                    <Route path="/users"
-                                           render={() => narrow(<UsersManagementScreen/>)}
-                                    />
-                                    <Route path={'/categories/:id'}
-                                           render={({match}) => narrow(<CategoriesViewScreen category_id={match.params['id']}/>)}
-                                    />
-                                    <Route path={'/categories'} exact
-
-                                           render={() => narrow(<CategoriesViewScreen category_id=""/>)}
-                                    />
-                                </Switch>
-                            )}
-                        </div>
-                    </div>
-                }/>
-            </Switch>
+            <div className="top app-container">
+                <AdminHeader/>
+                <div className="top content-layout ui extra top_menu_margin">
+                    {screenMargins(
+                        <ContentAreaCenter/>
+                    )}
+                </div>
+            </div>
         </React.Fragment>
     }
 }
 
-const narrow = (e: ReactNode) => {
-    return <div className="top screen_patterns narrow">{e}</div>
-};
-const screenMargins = (e: ReactNode) => {
-    return <div className="top screen_patterns basic">{e}</div>
-};

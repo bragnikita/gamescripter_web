@@ -8,6 +8,7 @@ export class UiState {
         params = {};
         path = '/';
     };
+    @observable activatedRoute: State | undefined = undefined;
 
     constructor() {
     }

@@ -1,32 +1,37 @@
 import React from "react";
-import {createRouter, State} from "router5";
-import browserPlugin from "router5-plugin-browser";
-import {AppRoute, AppRoutingMap} from "./types";
-import {getStore} from "./stores/root";
-import {CategoriesViewScreen} from "./components/Categories";
-import {Params} from "router5/types/types/base";
+import categories from './components/Categories/routes';
+import users from './components/Users/routes';
+import login from './components/Login/routes';
+import {AppRoutingMap, ScreenRoute} from "./types";
 
-const routesv = [
+class RoutesMap implements AppRoutingMap{
+    map: {[key: string]: ScreenRoute} = {};
+
+    add = (routes: ScreenRoute[]) => {
+        routes.forEach((r) => {
+            this.map[r.name] = r;
+        })
+    }
+}
+
+const map = new RoutesMap();
+
+const defaultRoutesDefs = [
     { name: 'home', path: '/' },
-    { name: 'categories.root', path: '/category'},
-    { name: 'categories.view', path: '/category/:id'}
+    { name: 'not_found', path: '/not_found'},
+    { name: 'users', path: '/users' },
+    { name: 'posting', path: '/posting' },
+    { name: 'categories', path: '/categories' },
+    { name: 'category', path: '/category'},
+    { name: 'category.id', path: '/:id'}
 ];
 
-
-const routes: AppRoutingMap = {};
-
-routes["categories.root"] = new class implements AppRoute {
-    comp = <CategoriesViewScreen />;
-    name ="categories.root";
-    path = "/category";
-
-    activate(params: Params, prevState?: State) {
-        return getStore().categories.setUp("");
-    }
-
-    deactivate(params: Params, nextState: State) {
-    }
-};
+map.add(defaultRoutesDefs);
+map.add(categories);
+map.add(users);
+map.add(login);
 
 
-export default routes;
+
+
+export default map;

@@ -4,6 +4,7 @@ import request, {Response, ResponseError, SuperAgentRequest} from 'superagent';
 import {RequestsController} from "../api/requests_controller";
 import {BACK_END_URL} from '../settings';
 import AppServices from "./index";
+import {ApiRequestError} from "../utils/errors";
 
 class DefaultApiError implements ApiError {
     code: string = "";
@@ -79,13 +80,9 @@ class HttpServiceBackend {
         configuredRequestsController.handleOtherErrors = (response: Response | undefined, resolve, reject) => {
             if (response) {
                 console.log(`[ERROR]${response.status} - ${response.text}`);
-                const err = new DefaultApiError();
-                err.message = response.text || '';
-                const body = response.body;
-                try {
-                    err.payload = JSON.parse(body);
-                    err.code = err.payload.code || "";
-                } catch (e) {
+                const err = new ApiRequestError(response);
+                if (!err.isRecoverable()) {
+                    AppServices.notify.error(err.message);
                 }
                 reject(err)
             } else {

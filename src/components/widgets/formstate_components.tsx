@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState} from "react";
 import {Checkbox, Dropdown, DropdownItemProps, Input, TextArea as Text} from "semantic-ui-react";
 import {FieldState} from "formstate";
 import {observer} from "mobx-react-lite";
@@ -19,7 +19,6 @@ interface TextFieldProps {
 export const TextField = observer(({
                                        password = false, label, name, wrapperClass, displayErrors = true, required = false, fieldState
                                    }: TextFieldProps) => {
-
     return <div className={classNames('app form-component textfield', wrapperClass)}>
         <FieldLabel label={label} required={required}/>
         <Input type={password ? 'password' : 'text'}
@@ -29,7 +28,6 @@ export const TextField = observer(({
                name={name}
                value={fieldState.value}
                onChange={(e, data) => fieldState.onChange(data.value)}
-               onBlur={fieldState.enableAutoValidationAndValidate}
         />
         <FieldError state={fieldState} displayError={displayErrors}/>
     </div>
@@ -122,10 +120,15 @@ const FieldLabel = ({label, required = false}: { label?: string, required?: bool
 };
 
 const FieldError = observer(({state, displayError=true}: { state: FieldState<any>, displayError?: boolean }) => {
-    if (state.hasError && displayError) {
-        return <small className="d-block small text-danger">{state.error}</small>
-    }
-    return null;
+    const msg = (() => {
+        if (state.hasError && displayError) {
+            return <small className="d-block text-danger">{state.error}</small>
+        }
+        return null;
+    })();
+    return <div className="app form-error">
+        {msg}
+    </div>
 });
 
 export const FormStateAsyncSelector = observer(<K extends {}, Key>(props: AsyncSelectorProps<K>) => {

@@ -1,6 +1,6 @@
 import {FieldState, FormState} from "formstate";
 import {required} from "../utils/validators";
-import {action, observable, runInAction} from "mobx";
+import {action, computed, observable, runInAction} from "mobx";
 import AppServices from "../services";
 import {AccountApi} from "../api/resource_apis";
 import {HttpClient} from "../types";
@@ -21,12 +21,16 @@ class Account {
 }
 
 export class AccountStore {
-    account: Account | undefined;
+    @observable account: Account | undefined;
 
     loginForm: FormState<LoginFormState>;
     @observable errorMessage: string | undefined;
 
     client: AccountApi;
+
+    @computed get isLoggedIn() {
+        return !!this.account
+    }
 
     constructor(http: HttpClient) {
         this.client = new AccountApi(http);
@@ -47,7 +51,7 @@ export class AccountStore {
         } else {
             this.account = new Account(username, username === 'admin');
             this.loginForm.reset();
-            AppServices.location.push('/');
+            AppServices.location.push('/categories');
         }
         // if (!['admin', 'nikita'].includes(username)) {
         //     this.errorMessage = `User ${username} was not found`;
@@ -56,5 +60,18 @@ export class AccountStore {
         //     this.loginForm.reset();
         //     AppServices.location.push('/')
         // }
+    };
+
+    @action tryStart = async () => {
+        const user = await this.client.getAccount();
+        if (!user) {
+            AppServices.location.push('/login')
+        } else {
+            runInAction(() => {
+                this.account = new Account(
+                    user.username, true
+                )
+            })
+        }
     }
 }

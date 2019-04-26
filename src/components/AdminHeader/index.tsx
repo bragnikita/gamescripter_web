@@ -36,6 +36,16 @@ export default class AdminHeader extends React.Component<any, {}> {
                         content='Main'
                         onClick={() => AppServices.location.push('/')}
                     />
+                    <Menu.Item
+                        name='cats'
+                        content='Categories'
+                        onClick={() => AppServices.location.push('/categories')}
+                    />
+                    <Menu.Item
+                        name='cats root'
+                        content='Categories root'
+                        onClick={() => AppServices.location.push('/category')}
+                    />
                     {isAdmin && <Menu.Item
                         name='users'
                         content='Users'
