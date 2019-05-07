@@ -153,11 +153,11 @@ export class Value<T> {
         }
     };
 
-    get existed():T {
+    get existed(): T {
         if (this.value === undefined) {
             throw 'Unexpected undefined value'
         }
-        return this.value as T ;
+        return this.value as T;
     };
 
     exists = () => !(this.value === undefined);
@@ -222,4 +222,32 @@ export class AppError {
 export interface TextValuePair {
     text: string,
     value: string,
+}
+
+export class StatusCatcher {
+    @observable error: any;
+    @observable statusMessage: string = "";
+    @observable inProcess: boolean = false;
+
+    @action
+    catchIt = async (cb: ({setStatus}: { setStatus(msg: string): void }) => any) => {
+        this.inProcess = true;
+        this.statusMessage = "";
+        this.error = undefined;
+        try {
+            return await cb({
+                    setStatus: (msg => {
+                        runInAction(() => this.statusMessage = msg);
+                    })
+                }
+            )
+        } catch (e) {
+            runInAction(() => this.error = e);
+        } finally {
+            runInAction(() => {
+                this.inProcess = false;
+            })
+        }
+
+    }
 }

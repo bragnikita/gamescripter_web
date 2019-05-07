@@ -34,7 +34,7 @@ const CategoryEditor = observer((props: any) => {
     if (!store.editorStore.visible) {
         return <Segment className={"app form-buttons-right"}>
             <Button onClick={store.newOne}>Create category</Button>
-            <Button>Create script</Button>
+            <Button onClick={store.createScript}>Create script</Button>
         </Segment>
     }
     return <Segment className="">
@@ -105,6 +105,8 @@ const CategoryItem = ({cat}: { cat: Category }) => (
 const ScriptItem = ({s}: { s: any }) => (
     <div className="__script_item d-flex justify-content-between">
         <span className="app vcenter">{s.title}</span>
-        <span/>
+        <span>
+            <Button onClick={() => AppServices.location.push('script_editor_classic-edit', {id: s.id})}>Edit</Button>
+        </span>
     </div>
 );

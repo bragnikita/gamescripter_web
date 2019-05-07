@@ -24,6 +24,7 @@ import {UiState} from "./stores/uistate";
 import {makeMobxRouter, makeNotLoggedInPlugin} from "./routing";
 import defaultRoutesDefs from "./routes";
 import {reaction} from "mobx";
+import {ClassicScriptStore} from "./stores/scripts";
 
 const notificationService = new SimpleNotificationService;
 
@@ -56,6 +57,7 @@ setAppStore({
     users: new UsersStore(clientInstance),
     categories: new CategoriesStore(new CategoriesApi(clientInstance)),
     dictionaries: new DictionariesStore(),
+    classic_scripts: new ClassicScriptStore(),
     ui: ui,
 });
 

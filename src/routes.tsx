@@ -2,6 +2,7 @@ import React from "react";
 import categories from './components/Categories/routes';
 import users from './components/Users/routes';
 import login from './components/Login/routes';
+import classic_scripts from './components/ClassicScript/routes';
 import {AppRoutingMap, ScreenRoute} from "./types";
 
 class RoutesMap implements AppRoutingMap{
@@ -30,6 +31,7 @@ map.add(defaultRoutesDefs);
 map.add(categories);
 map.add(users);
 map.add(login);
+map.add(classic_scripts);
 
 
 

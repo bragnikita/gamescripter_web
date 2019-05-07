@@ -7,6 +7,7 @@ import {classToPlain, Exclude, Expose, plainToClass, Type} from "class-transform
 import {jsonToClassSingle} from "../utils/serialization";
 import {getStore} from "./root";
 import {required} from "../utils/validators";
+import AppServices from "../services";
 
 @Exclude()
 export class Category {
@@ -117,6 +118,10 @@ class CategoriesStore {
     @action newOne = () => {
         this.editorStore.setUpForm(new Category());
         this.editorStore.show(true)
+    };
+
+    @action createScript = () => {
+        return AppServices.location.push('/script_classic/new')
     };
 
     @action save = async () => {

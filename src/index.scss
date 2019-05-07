@@ -57,6 +57,10 @@ code {
     @extend .form-buttons;
     justify-content: flex-end;
   }
+  &.form-buttons-left {
+    @extend .form-buttons;
+    justify-content: flex-end;
+  }
 
   &.form-error {
     min-height: 1.2em;

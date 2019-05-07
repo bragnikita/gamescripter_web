@@ -18,7 +18,7 @@ const createTransitionMiddlewareFactory = (routes: AppRoutingMap, store: UiState
             if (nextRoute.listener && nextRoute.listener.activate) {
                 await nextRoute.listener.activate(nextParams, fromState);
             }
-            store.activatedRoute = toState;
+            store.setActivatedRoot(toState);
         }
     }
 };

@@ -13,5 +13,10 @@ export class UiState {
     constructor() {
     }
 
+    @action
+    setActivatedRoot = (s: State) => {
+        this.activatedRoute = s;
+    };
+
     @action('route transition') setRoute = (newState: State) => this.route = newState;
 }

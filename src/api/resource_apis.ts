@@ -61,6 +61,6 @@ export class DictionariesApi extends Base {
     getAll = async() => await this.http.getJson("/dictionaries")
 }
 
-export class ScriptsApi {
+export class ScriptsApi extends Base {
 
 }
