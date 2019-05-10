@@ -1,5 +1,6 @@
-import {State} from "router5";
+import {Router, State} from "router5";
 import {action, observable} from "mobx";
+import {StatusCatcher} from "./types";
 
 export class UiState {
 
@@ -10,7 +11,12 @@ export class UiState {
     };
     @observable activatedRoute: State | undefined = undefined;
 
-    constructor() {
+    applicationInitState = new StatusCatcher();
+
+    router: Router;
+
+    constructor(router: Router) {
+        this.router = router;
     }
 
     @action
@@ -19,4 +25,23 @@ export class UiState {
     };
 
     @action('route transition') setRoute = (newState: State) => this.route = newState;
+
+    navigateAfterLogin = () => {
+        let current = this.router.getState();
+        const returnTo = current.params['returnTo'];
+        if (returnTo) {
+            const nextState = this.router.matchUrl(returnTo);
+            if (nextState) {
+                this.router.navigate(nextState.name, nextState.params, {replace: true});
+            } else {
+                return this.router.navigate('categories')
+            }
+        } else {
+            return this.router.navigate('categories')
+        }
+    };
+
+    navigateAfterLogout = () => {
+        return new Promise(resolve => this.router.navigate('login', resolve))
+    }
 }

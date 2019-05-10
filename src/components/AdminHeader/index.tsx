@@ -2,6 +2,7 @@ import React from "react";
 import {Container, Dropdown, Icon, Label, Menu} from "semantic-ui-react";
 import {observer} from "mobx-react-lite";
 import AppServices from "../../services";
+import {getStore} from "../../stores/root";
 
 
 const NotificationsTrigger = ({count}: { count: number }) => (<span>
@@ -68,6 +69,7 @@ export default class AdminHeader extends React.Component<any, {}> {
                                 <Dropdown.Item
                                     icon="user circle"
                                     text="Logout"
+                                    onClick={() => getStore().account.logout() }
                                 />
                             </Dropdown.Menu>
                         </Dropdown>

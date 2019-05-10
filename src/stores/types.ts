@@ -225,27 +225,34 @@ export interface TextValuePair {
 }
 
 export class StatusCatcher {
-    @observable error: any;
+    @observable error: AppError | undefined;
     @observable statusMessage: string = "";
-    @observable inProcess: boolean = false;
+    @observable processCounter: number = 0;
+
+    @computed get inProcess() {
+        return this.processCounter > 0
+    }
 
     @action
     catchIt = async (cb: ({setStatus}: { setStatus(msg: string): void }) => any) => {
-        this.inProcess = true;
+        this.processCounter++;
         this.statusMessage = "";
         this.error = undefined;
         try {
-            return await cb({
+            const res = await cb({
                     setStatus: (msg => {
                         runInAction(() => this.statusMessage = msg);
                     })
                 }
             )
+            console.log('after cb')
+            return res;
         } catch (e) {
             runInAction(() => this.error = e);
+            return undefined;
         } finally {
             runInAction(() => {
-                this.inProcess = false;
+                this.processCounter--;
             })
         }
 

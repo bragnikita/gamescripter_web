@@ -8,6 +8,7 @@ import {Button, Divider, Form, Label, Segment} from "semantic-ui-react";
 import {SyncSelector, TextArea, TextField} from "../widgets/formstate_components";
 import AppServices from "../../services";
 import {DictionaryValue} from "../widgets/dictionaries";
+import {NavButton} from "../widgets/buttons";
 
 @Observer
 export class CategoriesViewScreen extends React.Component<{}, {}> {
@@ -33,6 +34,7 @@ const CategoryEditor = observer((props: any) => {
     const form = store.editorStore.form;
     if (!store.editorStore.visible) {
         return <Segment className={"app form-buttons-right"}>
+            <NavButton to={'reader.category'} params={{id: store.currentCategory.existed.id}} returnTo>Show</NavButton>
             <Button onClick={store.newOne}>Create category</Button>
             <Button onClick={store.createScript}>Create script</Button>
         </Segment>
@@ -40,6 +42,7 @@ const CategoryEditor = observer((props: any) => {
     return <Segment className="">
         <Form className="app form-wrapper">
             <TextField name="title" label={"Title"} required fieldState={form.$.title}/>
+            <TextField name="subtitle" label={"Subtitle"} fieldState={form.$.subtitle}/>
             <TextArea name="description" label={"Description"} fieldState={form.$.description}/>
             <div className={"app form-inline form-component"}>
                 <SyncSelector label={"Type"} state={form.$.content_type} options={store.getDict('category_types')}/>

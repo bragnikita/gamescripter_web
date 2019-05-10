@@ -3,7 +3,7 @@ import {Script} from "./scripts";
 import {FieldState, FormState} from "formstate";
 import {FormStatus, Value} from "./types";
 import {CategoriesApi} from "../api/resource_apis";
-import {classToPlain, Exclude, Expose, plainToClass, Type} from "class-transformer";
+import {Exclude, Expose, Type} from "class-transformer";
 import {jsonToClassSingle} from "../utils/serialization";
 import {getStore} from "./root";
 import {required} from "../utils/validators";
@@ -15,6 +15,8 @@ export class Category {
     id: string = '';
     @Expose()
     title: string = '';
+    @Expose()
+    subtitle: string = '';
     @Expose()
     description: string = '';
     @Expose() @Type(() => Category)
@@ -31,6 +33,8 @@ export class Category {
     slug: string = '';
     @Expose()
     meta: any = {};
+    @Expose()
+    index: number = -1;
 
     validate = () => {
         if (!this.children) {
@@ -46,9 +50,11 @@ export class Category {
 
 type CategoryForm = {
     title: FieldState<string>;
+    subtitle: FieldState<string>;
     description: FieldState<string>;
     content_type: FieldState<string>;
     story_type: FieldState<string>;
+    index: FieldState<number>;
     slug: FieldState<string>;
 
 }
@@ -66,10 +72,12 @@ export class CategoryEditorStore {
     setUpForm(model: Category) {
         this.form = new FormState({
             title: new FieldState(model.title).validators(required()),
+            subtitle: new FieldState(model.subtitle),
             description: new FieldState(model.description),
             content_type: new FieldState(model.content_type || 'general'),
             story_type: new FieldState(model.story_type || 'chara'),
             slug: new FieldState(model.slug),
+            index: new FieldState(model.index),
         });
         this.model = model;
         this.status = new FormStatus();

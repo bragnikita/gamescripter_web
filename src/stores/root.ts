@@ -4,6 +4,7 @@ import CategoriesStore from "./categories";
 import {DictionariesStore} from "./dictionaries";
 import {UiState} from "./uistate";
 import {ClassicScriptStore} from "./scripts";
+import {ReaderStore} from "./reader";
 
 export interface IRootStore {
     account: AccountStore,
@@ -11,6 +12,7 @@ export interface IRootStore {
     categories: CategoriesStore,
     dictionaries: DictionariesStore,
     classic_scripts: ClassicScriptStore,
+    reader_store: ReaderStore,
     ui: UiState,
 }
 

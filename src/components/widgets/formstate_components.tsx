@@ -13,16 +13,19 @@ interface TextFieldProps {
     wrapperClass?: string,
     displayErrors?: boolean,
     required?: boolean,
+    placeholder?: string,
     fieldState: FieldState<string>
 }
 
 export const TextField = observer(({
-                                       password = false, label, name, wrapperClass, displayErrors = true, required = false, fieldState
+                                       password = false, label, name, wrapperClass, displayErrors = true, required = false, fieldState,
+                                       placeholder
                                    }: TextFieldProps) => {
     return <div className={classNames('app form-component textfield', wrapperClass)}>
         <FieldLabel label={label} required={required}/>
         <Input type={password ? 'password' : 'text'}
                fluid
+               placeholder={placeholder}
                required={required}
                error={fieldState.hasError && displayErrors}
                name={name}
@@ -40,11 +43,11 @@ export const TextArea = observer(({
     return <div className={`mbv_textarea app form-component ${wrapperClass || ''}`}>
         <FieldLabel label={label} required={required}/>
         <Text type="text"
-               required={required}
-               name={name}
-               value={fieldState.value}
-               onChange={(e, data) => fieldState.onChange(data.value + '')}
-               onBlur={fieldState.enableAutoValidationAndValidate}
+              required={required}
+              name={name}
+              value={fieldState.value}
+              onChange={(e, data) => fieldState.onChange(data.value + '')}
+              onBlur={fieldState.enableAutoValidationAndValidate}
         />
         <FieldError state={fieldState} displayError={displayErrors}/>
     </div>
@@ -70,14 +73,16 @@ interface SyncSelectorProps<T> {
     options: DropdownItemProps[],
     state: FieldState<any>,
     label?: string,
+    className?: string,
 
     [key: string]: any
 }
 
 export const SyncSelector = observer(<T extends any>(props: SyncSelectorProps<T>) => {
     const {options, state} = props;
+    const classes = classNames(props.className, "app form-component");
     return <Dropdown selection
-                     className={"app form-component"}
+                     className={classes}
                      options={options}
                      value={state.value as any}
                      onChange={(e, {value}) => state.onChange(value as any)}
@@ -119,7 +124,7 @@ const FieldLabel = ({label, required = false}: { label?: string, required?: bool
     return null;
 };
 
-const FieldError = observer(({state, displayError=true}: { state: FieldState<any>, displayError?: boolean }) => {
+const FieldError = observer(({state, displayError = true}: { state: FieldState<any>, displayError?: boolean }) => {
     const msg = (() => {
         if (state.hasError && displayError) {
             return <small className="d-block text-danger">{state.error}</small>

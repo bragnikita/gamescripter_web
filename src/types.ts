@@ -1,8 +1,6 @@
 import uri from 'urijs';
 import {Response} from 'superagent';
-import {IRootStore} from "./stores/root";
 import {Params, State} from "router5/types/types/base";
-import {Route} from "router5";
 
 export type AppURI = uri.URI;
 
@@ -32,17 +30,15 @@ export interface HttpClient extends RequireHttpGet{
     del(url:string): Promise<any>;
 
 }
-export interface HttpError {
-    isFailedRequest: boolean,
-    status: number,
-    message: string,
-    json?: any,
+
+export interface AppError {
+    getMessage():string
 }
 
-export interface ApiError {
+export interface ApiError extends AppError {
     code: string,
     message: string,
-    payload: any,
+    details: any,
 }
 
 export interface AppNotification {

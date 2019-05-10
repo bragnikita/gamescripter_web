@@ -4,6 +4,7 @@ import {action, computed, observable, runInAction} from "mobx";
 import AppServices from "../services";
 import {AccountApi} from "../api/resource_apis";
 import {HttpClient} from "../types";
+import {getStore} from "./root";
 
 type LoginFormState = {
     username: FieldState<string>,
@@ -28,6 +29,8 @@ export class AccountStore {
 
     client: AccountApi;
 
+    autoLoginAttempts = 0;
+
     @computed get isLoggedIn() {
         return !!this.account
     }
@@ -51,27 +54,35 @@ export class AccountStore {
         } else {
             this.account = new Account(username, username === 'admin');
             this.loginForm.reset();
-            AppServices.location.push('/categories');
+            getStore().ui.navigateAfterLogin();
         }
-        // if (!['admin', 'nikita'].includes(username)) {
-        //     this.errorMessage = `User ${username} was not found`;
-        // } else {
-        //     this.account = new Account(username, username === 'admin');
-        //     this.loginForm.reset();
-        //     AppServices.location.push('/')
-        // }
     };
 
     @action tryStart = async () => {
-        const user = await this.client.getAccount();
-        if (!user) {
-            AppServices.location.push('/login')
-        } else {
-            runInAction(() => {
-                this.account = new Account(
-                    user.username, true
-                )
-            })
+        if (this.autoLoginAttempts > 0) {
+            return false;
         }
+        this.autoLoginAttempts++;
+        const user = await this.client.getAccount();
+        // const user = await (async() => ({ username: "admin", code: ''}))();
+        if (!user) {
+            return false;
+        }
+        if (user.code && user.code === 'not_authenticated') {
+            return false;
+        }
+        this.autoLoginAttempts = 0;
+        runInAction(() => {
+            this.account = new Account(
+                user.username, user.username === 'admin'
+            )
+        });
+        return true;
+    };
+
+    @action logout = async () => {
+        AppServices.token.clear();
+        this.account = undefined;
+        await getStore().ui.navigateAfterLogout();
     }
 }

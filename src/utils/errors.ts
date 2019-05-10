@@ -7,9 +7,10 @@ export class ApiRequestError implements ApiError {
     status: number;
     json?: any;
     code: string = "";
-    payload: any;
+    details: any;
 
     constructor(responseObject: any) {
+        this.response = responseObject;
         if (responseObject.status === undefined) {
             this.status = 0;
         }
@@ -19,12 +20,12 @@ export class ApiRequestError implements ApiError {
         this.status = this.getStatus();
         this.json = this.getBodyJson();
         if (this.json) {
-            this.payload = this.json;
+            this.details = this.json;
             this.code = this.json.code;
         }
         this.message = this.getMessage();
         if (!this.json) {
-            this.payload = this.message;
+            this.details = this.message;
         }
     }
 
@@ -85,7 +86,7 @@ export class ApiRequestError implements ApiError {
         return this.response.serverError;
     };
     isRecoverable = () => {
-        return this.status == 400 || this.status == 401
+        return this.status == 400 || this.status == 401 || this.status == 422
     };
     toString = () => {
         return this.getMessage();

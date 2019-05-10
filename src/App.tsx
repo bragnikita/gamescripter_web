@@ -1,6 +1,5 @@
 import React, {Component} from 'react';
 import './App.css';
-import {Router} from "react-router";
 import DevTools from "mobx-react-devtools";
 import NotificationSystem from 'react-notification-system';
 import {
@@ -10,8 +9,6 @@ import {
     SimpleNotificationService
 } from "./services/appservices";
 import ContentArea from "./components/Main";
-import {RouterStore, syncHistoryWithStore} from "mobx-react-router";
-import {createBrowserHistory} from "history";
 import {getStore, setAppStore} from "./stores/root";
 import {AccountStore} from "./stores/account";
 import AppServices, {AppServicesHolder} from "./services";
@@ -21,19 +18,15 @@ import CategoriesStore from "./stores/categories";
 import {CategoriesApi} from "./api/resource_apis";
 import {DictionariesStore} from "./stores/dictionaries";
 import {UiState} from "./stores/uistate";
-import {makeMobxRouter, makeNotLoggedInPlugin} from "./routing";
+import {AccessControlMiddleware, createTransitionMiddlewareFactory, makeMobxRouter} from "./routing";
 import defaultRoutesDefs from "./routes";
-import {reaction} from "mobx";
 import {ClassicScriptStore} from "./stores/scripts";
+import {ReaderStore} from "./stores/reader";
 
 const notificationService = new SimpleNotificationService;
 
-const routerStore = new RouterStore();
-const browserHistory = createBrowserHistory();
-const history = syncHistoryWithStore(browserHistory, routerStore);
-
-const ui = new UiState();
-const router = makeMobxRouter(defaultRoutesDefs, ui);
+const router = makeMobxRouter(defaultRoutesDefs);
+const ui = new UiState(router);
 const navigationService = new Router5BasedLocationSevice(router);
 
 
@@ -42,7 +35,6 @@ const tokenService = new ApiTokenService("x-access-token", storageService);
 
 const httpServiceFactory = new HttpServiceBackend(tokenService, navigationService);
 const clientInstance = httpServiceFactory.serviceInstance;
-
 
 const servicesHolder = AppServicesHolder.instance();
 
@@ -58,14 +50,22 @@ setAppStore({
     categories: new CategoriesStore(new CategoriesApi(clientInstance)),
     dictionaries: new DictionariesStore(),
     classic_scripts: new ClassicScriptStore(),
+    reader_store: new ReaderStore(),
     ui: ui,
 });
 
-router.usePlugin(makeNotLoggedInPlugin(() => getStore().account.isLoggedIn));
-router.start();
+httpServiceFactory.configuredRequestController.onNeedAuthentication = () => {
+    if (getStore().account.isLoggedIn) {
+        AppServices.notify.message({name: "app.need_relogin" })
+    } else {}
+};
 
-reaction(() => getStore().account.account, async (user) => {
-    if (!user) return;
+router.useMiddleware(
+    new AccessControlMiddleware().createMiddleware,
+    createTransitionMiddlewareFactory(defaultRoutesDefs, ui)
+);
+router.start();
+ui.applicationInitState.catchIt(async () => {
     await getStore().dictionaries.preLoad();
 });
 
@@ -80,19 +80,19 @@ if (process.env.NODE_ENV === 'development') {
 class App extends Component {
     render() {
         return (
-            <Router history={history}>
-                <React.Fragment>
+            <React.Fragment>
+                <div className="top app-container">
                     <ContentArea/>
-                    <DevTools
-                        position={
-                            {
-                                top: -2,
-                                right: 200,
-                            }}
-                    />
-                    <NotificationSystem ref={(ref: NotificationSystem.System) => notificationService.setRef(ref)}/>
-                </React.Fragment>
-            </Router>
+                </div>
+                <DevTools
+                    position={
+                        {
+                            top: -2,
+                            right: 200,
+                        }}
+                />
+                <NotificationSystem ref={(ref: NotificationSystem.System) => notificationService.setRef(ref)}/>
+            </React.Fragment>
         );
     }
 }

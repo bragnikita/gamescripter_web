@@ -24,7 +24,7 @@ export class AccountApi extends Base {
 
     logout = () => {
         AppServices.token.clear();
-    }
+    };
 
     getAccount = async() => {
         try {

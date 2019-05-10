@@ -54,11 +54,25 @@ code {
     }
   }
   &.form-buttons-right {
-    @extend .form-buttons;
+    display: flex;
+    align-items: center;
+    & > * {
+      margin-left: 1em;
+      &:first-child {
+        margin-left: 0;
+      }
+    }
     justify-content: flex-end;
   }
   &.form-buttons-left {
-    @extend .form-buttons;
+    display: flex;
+    align-items: center;
+    & > * {
+      margin-left: 1em;
+      &:last-child {
+        margin-left: 0;
+      }
+    }
     justify-content: flex-end;
   }
 
@@ -98,5 +112,28 @@ code {
         margin-right: 0;
       }
     }
+    &.left {
+      justify-content: flex-start;
+    }
+    &.right {
+      justify-content: flex-end;
+    }
   }
+}
+
+.app {
+  .w-50 { width: 50% !important;}
+  .form-component {
+    &.w-small { max-width: 150px}
+  }
+}
+
+.app {
+  &.text-4 {
+    font-size: 1.8rem; font-weight: bold;
+    padding: 0.5rem 1rem;
+  }
+  &.text-3 { font-size: 1.3rem}
+  &.text-2 { font-size: 1.1rem}
+  &.text-1 { font-size: 1.0rem}
 }

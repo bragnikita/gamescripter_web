@@ -6,16 +6,27 @@ import {getStore} from "../../stores/root";
 import {ClassicScriptStore} from "../../stores/scripts";
 import "./styles.scss";
 import 'brace/theme/github';
-import {TextField} from "../widgets/formstate_components";
+import {SyncSelector, TextField} from "../widgets/formstate_components";
+import {reaction} from "mobx";
 
 
 @observer
 export default class EditorScreen extends React.Component<{}, {}> {
     private store: ClassicScriptStore;
+    private previewInsert = React.createRef<HTMLDivElement>();
 
     constructor(props: any) {
         super(props);
         this.store = getStore().classic_scripts;
+        reaction(() => this.store.previewHtml, (html) => {
+            if (!this.previewInsert.current) return;
+            if (html) {
+                console.log('inserting html', html.substr(0, 50));
+                this.previewInsert.current.innerHTML = html;
+            } else {
+                this.previewInsert.current.innerHTML = '';
+            }
+        }, {name: 'preview update'})
     }
 
     render() {
@@ -24,9 +35,13 @@ export default class EditorScreen extends React.Component<{}, {}> {
                 <TextField
                     name="title"
                     fieldState={this.store.form.$.title}
-                    label={"Title"}
+                    placeholder="Title"
                     required
                 />
+                <div className="app form-inline">
+                    <SyncSelector label={"Type"} state={this.store.form.$.type} className={"w-small"}
+                                  options={getStore().dictionaries.getAsDropdownOptions('script_types')}/>
+                </div>
             </Segment>
             <Segment className="app form-buttons-left block-controls">
                 <span>{this.store.opState.statusMessage}</span>
@@ -43,19 +58,27 @@ export default class EditorScreen extends React.Component<{}, {}> {
                 />
             </Segment>
             <Segment className="block-editor">
-                <AceEditor
-                    theme={"github"}
-                    name={"script-text-input"}
-                    onChange={this.store.form.$.script.onChange}
-                    value={this.store.form.$.script.value}
-                    width={"100%"}
-                    minLines={20}
-                    maxLines={Infinity}
-                    focus
-                    highlightActiveLine
-                    wrapEnabled
-                    showPrintMargin={false}
-                />
+                <div className="__editor">
+                    <AceEditor
+                        theme={"github"}
+                        name={"script-text-input"}
+                        onChange={this.store.form.$.script.onChange}
+                        value={this.store.form.$.script.value}
+                        width={"100%"}
+                        minLines={20}
+                        maxLines={Infinity}
+                        focus
+                        highlightActiveLine
+                        wrapEnabled
+                        showPrintMargin={false}
+                    />
+                </div>
+                <div className="__preview">
+                    <div className="story"
+                         ref={this.previewInsert}
+                         style={{display: this.store.previewHtml ? 'block' : 'none'}}
+                    />
+                </div>
             </Segment>
             <Segment className="block-attachments">
 

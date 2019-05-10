@@ -2,6 +2,7 @@ import React from "react";
 import categories from './components/Categories/routes';
 import users from './components/Users/routes';
 import login from './components/Login/routes';
+import reader from './components/Reader/routes';
 import classic_scripts from './components/ClassicScript/routes';
 import {AppRoutingMap, ScreenRoute} from "./types";
 
@@ -32,8 +33,13 @@ map.add(categories);
 map.add(users);
 map.add(login);
 map.add(classic_scripts);
+map.add(reader);
 
-
+export const publicRoutes = () => {
+  return [
+      'login', 'reader', 'not_found'
+  ]
+};
 
 
 export default map;
