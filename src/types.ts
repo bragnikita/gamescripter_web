@@ -71,6 +71,7 @@ export interface ScreenRoute {
 
 export interface AppRoute {
     comp?: React.ReactElement,
+    redirectTo?: string,
     activate?(params: Params, prevState?: State):void
     deactivate?(params: Params, nextState: State): void
 }

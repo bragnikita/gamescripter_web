@@ -112,7 +112,11 @@ export class ClassicScriptStore {
         script.fromJson(s);
         this.script.value = script;
         this.setForm(script);
-    }
+    };
+
+    onRemove = async (id: string) => {
+        await this.api.http.del(`/script/${id}`)
+    };
 
     private setForm(s: Script) {
         this.form = new FormState({

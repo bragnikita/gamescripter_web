@@ -8,6 +8,7 @@ import "./styles.scss";
 import 'brace/theme/github';
 import {SyncSelector, TextField} from "../widgets/formstate_components";
 import {reaction} from "mobx";
+import {NavButton} from "../widgets/buttons";
 
 
 @observer
@@ -43,19 +44,26 @@ export default class EditorScreen extends React.Component<{}, {}> {
                                   options={getStore().dictionaries.getAsDropdownOptions('script_types')}/>
                 </div>
             </Segment>
-            <Segment className="app form-buttons-left block-controls">
-                <span>{this.store.opState.statusMessage}</span>
-                <span>{this.store.opState.error && this.store.opState.error.toString()}</span>
-                <Button
-                    loading={this.store.opState.inProcess}
-                    primary
-                    content="Save"
-                    onClick={this.store.onUpdate}
-                />
-                <Button primary content="Preview"
+            <Segment className="app hlist-container left-right block-controls">
+                <div>
+                    <NavButton to="categories.one" params={{id: this.store.script.existed.category_id}}>
+                        Close
+                    </NavButton>
+                </div>
+                <div>
+                    <span>{this.store.opState.statusMessage}</span>
+                    <span>{this.store.opState.error && this.store.opState.error.toString()}</span>
+                    <Button
                         loading={this.store.opState.inProcess}
-                        onClick={this.store.onPreview}
-                />
+                        primary
+                        content="Save"
+                        onClick={this.store.onUpdate}
+                    />
+                    <Button primary content="Preview"
+                            loading={this.store.opState.inProcess}
+                            onClick={this.store.onPreview}
+                    />
+                </div>
             </Segment>
             <Segment className="block-editor">
                 <div className="__editor">

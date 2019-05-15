@@ -3,6 +3,7 @@ import {Category} from "./categories";
 import {action, runInAction} from "mobx";
 import AppServices from "../services";
 import {jsonToClassSingle} from "../utils/serialization";
+import {getStore} from "./root";
 
 export class ReaderStore {
 
@@ -18,5 +19,9 @@ export class ReaderStore {
                 this.currentCategory.validate();
             })
         })
+    }
+
+    readOnly = () => {
+        return !getStore().account.isLoggedIn
     }
 }

@@ -102,6 +102,7 @@ const CategoryItem = ({cat}: { cat: Category }) => (
         <span>
           <Button onClick={() => AppServices.location.push('categories.one', {id: cat.id})}>Show</Button>
           <Button onClick={() => getStore().categories.editorStore.setUpForm(cat)}>Edit</Button>
+          <Button color="red" icon="trash" onClick={() => getStore().categories.remove(cat.id)} />
       </span>
     </div>
 );
@@ -110,6 +111,10 @@ const ScriptItem = ({s}: { s: any }) => (
         <span className="app vcenter">{s.title}</span>
         <span>
             <Button onClick={() => AppServices.location.push('script_editor_classic-edit', {id: s.id})}>Edit</Button>
+            <Button color="red" icon="trash" onClick={async () => {
+                await getStore().classic_scripts.onRemove(s.id)
+                await getStore().categories.setUp(getStore().categories.currentCategory.existed.id)
+            }} />
         </span>
     </div>
 );

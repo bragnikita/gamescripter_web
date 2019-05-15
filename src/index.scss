@@ -118,6 +118,9 @@ code {
     &.right {
       justify-content: flex-end;
     }
+    &.left-right {
+      justify-content: space-between;
+    }
   }
 }
 

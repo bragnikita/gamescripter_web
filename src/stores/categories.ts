@@ -92,6 +92,7 @@ export class CategoryEditorStore {
         const c:any = {};
         c.title = $.title.$;
         c.description = $.description.$;
+        c.subtitle = $.subtitle.$;
         c.content_type = $.content_type.$;
         c.meta = {};
         c.meta.story_type = c.content_type === 'story' ? $.story_type.$ : null;
@@ -153,6 +154,11 @@ class CategoriesStore {
             c.validate();
             return c;
         })
+    };
+
+    @action remove = async (id: string) => {
+        await this.api.delete(id);
+        await this.setUp(this.currentCategory.existed.id);
     };
 
     getDict(name: string) {

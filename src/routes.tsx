@@ -4,7 +4,7 @@ import users from './components/Users/routes';
 import login from './components/Login/routes';
 import reader from './components/Reader/routes';
 import classic_scripts from './components/ClassicScript/routes';
-import {AppRoutingMap, ScreenRoute} from "./types";
+import {AppRoute, AppRoutingMap, ScreenRoute} from "./types";
 
 class RoutesMap implements AppRoutingMap{
     map: {[key: string]: ScreenRoute} = {};
@@ -19,7 +19,7 @@ class RoutesMap implements AppRoutingMap{
 const map = new RoutesMap();
 
 const defaultRoutesDefs = [
-    { name: 'home', path: '/' },
+    { name: 'home', path: '/', listener: {redirectTo: 'categories'}},
     { name: 'not_found', path: '/not_found'},
     { name: 'users', path: '/users' },
     { name: 'posting', path: '/posting' },

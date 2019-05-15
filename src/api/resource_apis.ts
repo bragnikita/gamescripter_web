@@ -54,6 +54,7 @@ export class CategoriesApi extends Base {
             return await this.http.getJson('/category/root');
         }
     };
+    delete = async (id: string) => this.http.del(`/category/${id}`);
     getParents = async(childId: string) => await this.http.get(`/category/${childId}/parents`);
 }
 

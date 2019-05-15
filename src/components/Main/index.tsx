@@ -5,12 +5,12 @@ import {observer} from "mobx-react";
 import defaultRoutesDefs from "../../routes";
 import {getStore} from "../../stores/root";
 import {screenMargins} from "../widgets/screens";
-import {inspect} from "util";
 import {CenteredLoader} from "../widgets/loaders";
 
 const ContentAreaCenter = observer((props: any) => {
     const currentRoute = getStore().ui.activatedRoute;
-    console.log(inspect(currentRoute));
+    console.log("trying to display: ");
+    console.log(currentRoute);
     if (!currentRoute) return null;
     let route = defaultRoutesDefs.map[currentRoute ? currentRoute.name : 'not_found'];
     if (!route) {

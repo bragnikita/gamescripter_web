@@ -18,6 +18,9 @@ export const createTransitionMiddlewareFactory = (routes: AppRoutingMap, store: 
             if (prevRoute && prevRoute.listener && prevRoute.listener.deactivate) {
                 await prevRoute.listener.deactivate(prevParams, toState);
             }
+            if (nextRoute.listener && nextRoute.listener.redirectTo) {
+                throw {redirect: {name: nextRoute.listener.redirectTo }}
+            }
             store.route = toState;
             if (nextRoute.listener && nextRoute.listener.activate) {
                 await nextRoute.listener.activate(nextParams, fromState);

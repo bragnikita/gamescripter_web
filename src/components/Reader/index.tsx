@@ -12,6 +12,7 @@ import {CategoryButton} from "./menu";
 
 const ReaderScreen = observer((props: any) => {
     const store = getStore().reader_store;
+    const readonly = store.readOnly()
     if (store.categoryState.inProcess) {
         return <CenteredLoader/>
     }
@@ -27,6 +28,9 @@ const ReaderScreen = observer((props: any) => {
                 Top
             </NavButton>
             }
+            {!readonly && <NavButton to="categories.one" params={{id: category.id}} icon="edit" /> }
+        </div>
+        <div>
             <span className={"app text-4"}>{category.title}</span>
         </div>
         {category.children.length > 0 &&
@@ -82,7 +86,7 @@ const CategoriesMenu = ({category}: { category: Category }) => {
         {categories.length == 0 && <div className="__no_categories">This category is empty</div>}
         <div className="__list">
             {categories.map((c: Category) => {
-                return <CategoryButton key={c.id} title={c.title} id={c.id} subtitle={"Эпизод 1"}/>
+                return <CategoryButton key={c.id} title={c.title} id={c.id} subtitle={c.subtitle}/>
             })}
         </div>
     </div>
