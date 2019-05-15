@@ -1,15 +1,11 @@
-import {ApiError, LocationService, TokenService} from "../types";
+import {LocationService, TokenService} from "../types";
 import {Client} from "../api/client";
 import request, {Response, ResponseError, SuperAgentRequest} from 'superagent';
-import {RequestsController} from "../api/requests_controller";
+import {IRequestController, RequestsController} from "../api/requests_controller";
 import {BACK_END_URL} from '../settings';
 import AppServices from "./index";
+import {ApiRequestError} from "../utils/errors";
 
-class DefaultApiError implements ApiError {
-    code: string = "";
-    message: string = "";
-    payload: any = {};
-}
 
 class HttpServiceBackend {
 
@@ -17,10 +13,12 @@ class HttpServiceBackend {
 
     private tokenService: TokenService;
     private navigationService: LocationService;
+    configuredRequestController: RequestsController;
 
     constructor(tokenService: TokenService, navigationService: LocationService) {
         this.tokenService = tokenService;
         this.navigationService = navigationService;
+        this.configuredRequestController = new RequestsController();
     }
 
 
@@ -53,13 +51,6 @@ class HttpServiceBackend {
     };
 
     private errorHandler = (responseOrError: Response | ResponseError) => {
-        if (responseOrError.status === undefined) {
-            // network error
-            return;
-        }
-        const response = responseOrError as Response;
-        if (response.status === 401) {
-        }
     };
 
     get serviceInstance(): Client {
@@ -74,30 +65,24 @@ class HttpServiceBackend {
 
     private initializeService() {
         const service = new Client(BACK_END_URL, this.configureAgent());
-
-        const configuredRequestsController = new RequestsController();
-        configuredRequestsController.handleOtherErrors = (response: Response | undefined, resolve, reject) => {
+        this.configuredRequestController.handleOtherErrors = (response: Response | undefined, resolve, reject) => {
             if (response) {
                 console.log(`[ERROR]${response.status} - ${response.text}`);
-                const err = new DefaultApiError();
-                err.message = response.text || '';
-                const body = response.body;
-                try {
-                    err.payload = JSON.parse(body);
-                    err.code = err.payload.code || "";
-                } catch (e) {
+                const err = new ApiRequestError(response);
+                console.log(err);
+                if (!err.isRecoverable()) {
+                    AppServices.notify.error(err.message);
                 }
                 reject(err)
             } else {
                 console.log("Response object is null - network error");
-                AppServices.notify.error('Network error');
+                AppServices.notify.error('Network error!');
             }
         };
-        configuredRequestsController.onNeedAuthentication = () => {
+        this.configuredRequestController.onNeedAuthentication = () => {
             AppServices.notify.message({name: "app.need_relogin" })
         };
-
-        service.requestsController = configuredRequestsController;
+        service.requestsController = this.configuredRequestController;
         this.service = service;
     }
 }

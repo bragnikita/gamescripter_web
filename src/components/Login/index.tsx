@@ -4,7 +4,7 @@ import {AccountStore} from "../../stores/account";
 import {getStore} from "../../stores/root";
 import {TextField} from "../widgets/formstate_components";
 import {Button, Segment} from "semantic-ui-react";
-import {observer} from "mobx-react";
+import {observer} from "mobx-react-lite";
 
 const Login = observer(({store}: { store: AccountStore }) => {
 

@@ -1,7 +1,8 @@
 import React from "react";
 import {Container, Dropdown, Icon, Label, Menu} from "semantic-ui-react";
-import {observer} from "mobx-react";
+import {observer} from "mobx-react-lite";
 import AppServices from "../../services";
+import {getStore} from "../../stores/root";
 
 
 const NotificationsTrigger = ({count}: { count: number }) => (<span>
@@ -36,6 +37,16 @@ export default class AdminHeader extends React.Component<any, {}> {
                         content='Main'
                         onClick={() => AppServices.location.push('/')}
                     />
+                    <Menu.Item
+                        name='cats'
+                        content='Categories'
+                        onClick={() => AppServices.location.push('/categories')}
+                    />
+                    <Menu.Item
+                        name='cats root'
+                        content='Categories root'
+                        onClick={() => AppServices.location.push('/category')}
+                    />
                     {isAdmin && <Menu.Item
                         name='users'
                         content='Users'
@@ -58,6 +69,7 @@ export default class AdminHeader extends React.Component<any, {}> {
                                 <Dropdown.Item
                                     icon="user circle"
                                     text="Logout"
+                                    onClick={() => getStore().account.logout() }
                                 />
                             </Dropdown.Menu>
                         </Dropdown>

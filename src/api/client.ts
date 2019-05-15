@@ -41,7 +41,7 @@ export class Client implements HttpClient {
 
     postJson = async (url: string, body: any): Promise<any> => {
         const response = await this.requestsController.call(()=> this.request.post(this.__fullPath(url)).send(body));
-        return response.body;
+        return response.body || response.text;
     };
 
     putJson = async (url: string, body: any): Promise<any> => {

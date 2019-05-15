@@ -1,5 +1,6 @@
 import uri from 'urijs';
 import {Response} from 'superagent';
+import {Params, State} from "router5/types/types/base";
 
 export type AppURI = uri.URI;
 
@@ -29,17 +30,15 @@ export interface HttpClient extends RequireHttpGet{
     del(url:string): Promise<any>;
 
 }
-export interface HttpError {
-    isFailedRequest: boolean,
-    status: number,
-    message: string,
-    json?: any,
+
+export interface AppError {
+    getMessage():string
 }
 
-export interface ApiError {
+export interface ApiError extends AppError {
     code: string,
     message: string,
-    payload: any,
+    details: any,
 }
 
 export interface AppNotification {
@@ -63,3 +62,20 @@ export interface RequireHttpGet {
     get(url: string, search?: any, options?: HttpRequestOptions): Promise<Response>;
 }
 export type RequestConfirmation = (message: string) => Promise<any>;
+
+export interface ScreenRoute {
+    name: string,
+    path: string,
+    listener?: AppRoute,
+}
+
+export interface AppRoute {
+    comp?: React.ReactElement,
+    redirectTo?: string,
+    activate?(params: Params, prevState?: State):void
+    deactivate?(params: Params, nextState: State): void
+}
+
+export interface AppRoutingMap {
+    map: {[key: string]: ScreenRoute},
+}
