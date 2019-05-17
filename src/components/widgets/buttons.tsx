@@ -1,6 +1,8 @@
 import React, {useState} from 'react';
 import {Button, ButtonProps} from "semantic-ui-react";
 import AppServices from "../../services";
+import {getStore} from "../../stores/root";
+import {State} from "router5";
 
 interface NavButtonProps extends ButtonProps {
     to: string,
@@ -29,10 +31,48 @@ export const NavButton = ({
     >{children}</C>
 };
 
+export const NavLink = ({
+                            link,
+                            to,
+                            params = {},
+                            children,
+                            ...rest
+                        }: {
+    link?: string,
+    to?: string,
+    params?: any,
+    children?: React.ReactNode,
+}) => {
+    const router = useRouter();
+    let state: State | undefined | null = undefined;
+    if (to) {
+        state = router.makeState(to, params)
+    } else if (link) {
+        state = router.matchUrl(link);
+    }
+    let llink = link;
+    if (!llink && state) {
+        llink = router.buildPath(state.name, state.params)
+    }
+
+    return <a href={llink || '#'} onClick={(e) => {
+        e.preventDefault();
+        if (state) {
+            router.navigate(state.name, state.params)
+        }
+    }
+    } {...rest}>{children}</a>
+};
+
+const useRouter = () => {
+    return getStore().ui.router;
+};
+
 
 interface ActionButtonProps extends ButtonProps {
     comp?: React.ComponentType
     preventDefault?: boolean
+
     runAction(e: React.MouseEvent<HTMLButtonElement>): any;
 }
 

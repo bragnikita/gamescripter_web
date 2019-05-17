@@ -35,6 +35,8 @@ export class Category {
     meta: any = {};
     @Expose()
     index: number = -1;
+    @Expose()
+    resources_prefix: string = "";
 
     validate = () => {
         if (!this.children) {
@@ -89,7 +91,7 @@ export class CategoryEditorStore {
         if (res.hasError) return null;
 
         const $ = this.form.$;
-        const c:any = {};
+        const c: any = {};
         c.title = $.title.$;
         c.description = $.description.$;
         c.subtitle = $.subtitle.$;
@@ -134,7 +136,7 @@ class CategoriesStore {
     };
 
     @action save = async () => {
-        const json:any = await this.editorStore.collect();
+        const json: any = await this.editorStore.collect();
         if (!json) return;
         if (json.id) {
             await this.api.update(json.id, json);
@@ -150,7 +152,7 @@ class CategoriesStore {
         this.editorStore.show(false);
         await this.currentCategory.setUp(async () => {
             const category = await this.api.fetch(id);
-            const c =  jsonToClassSingle(Category, category);
+            const c = jsonToClassSingle(Category, category);
             c.validate();
             return c;
         })
