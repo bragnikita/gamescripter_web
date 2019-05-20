@@ -32,7 +32,7 @@ beforeAll(() => {
 
 });
 
-describe('CategoriesStore', () => {
+xdescribe('CategoriesStore', () => {
     describe('constructor', () => {
         it('create full structure', async () => {
             const MockedApi = class MockApi extends CategoriesApi {
