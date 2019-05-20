@@ -79,7 +79,7 @@ export class Router5BasedLocationSevice implements LocationService {
 
     push(path: string, query?: any): void {
         let newStateName;
-        if (path.startsWith('/')) {
+        if (path.startsWith('/') || path.startsWith('../')) {
             const newState = this.router.matchPath(path);
             if (newState) {
                 newStateName = newState.name;

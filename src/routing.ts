@@ -40,7 +40,10 @@ export class AccessControlMiddleware {
         return async (toState, fromState, done) => {
             let path = transitionPath(toState, fromState);
             console.log("trying next state ", toState.name);
-            const privateRoute = _.intersection(path.toActivate, publicRoutes()).length == 0;
+            console.log(path);
+            console.log(publicRoutes());
+            console.log(_.intersection([path.intersection, ...path.toActivate], publicRoutes()));
+            const privateRoute = _.intersection([path.intersection, ...path.toActivate], publicRoutes()).length == 0;
             if (privateRoute && !store.isLoggedIn) {
                 const res = await getStore().ui.applicationInitState.catchIt(() => {
                    return store.tryStart();

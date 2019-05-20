@@ -1,14 +1,17 @@
-import React from 'react';
+import React, {useCallback} from 'react';
 import {observer} from "mobx-react-lite";
 import {Script} from "../../stores/scripts";
 import {getStore} from "../../stores/root";
 import {CenteredLoader} from "../widgets/loaders";
 import './reader.css'
+import "./menu_button.png"
 import './styles.scss'
 import {Category} from "../../stores/categories";
 import _ from "lodash";
-import {NavButton} from "../widgets/buttons";
+import {NavButton, NavLink} from "../widgets/buttons";
 import {CategoryButton} from "./menu";
+import AppServices from "../../services";
+import $ from 'jquery';
 
 const ReaderScreen = observer((props: any) => {
     const store = getStore().reader_store;
@@ -21,23 +24,31 @@ const ReaderScreen = observer((props: any) => {
         return null;
     }
     const scripts = category.scripts;
-    return <div className="reader">
+    return <div className="reader story">
+        {!readonly &&
         <div className={"app top-nav hlist-container left"}>
             {category.parent_id &&
             <NavButton to="reader.category" params={{id: category.parent_id}} basic>
                 Top
             </NavButton>
             }
-            {!readonly && <NavButton to="categories.one" params={{id: category.id}} icon="edit" /> }
+            <NavButton to="categories.one" params={{id: category.id}} icon="edit"/>
         </div>
-        <div>
-            <span className={"app text-4"}>{category.title}</span>
-        </div>
+        }
+        {readonly &&
+        <React.Fragment>
+            <div className={"nav_header"}>
+                {category.parent_id && <TopNav to={"reader.category"} params={{id: category.parent_id}} name="Back"/>}
+                <CategoryHeader title={category.title} subtitle={category.subtitle}/>
+            </div>
+        </React.Fragment>
+        }
         {category.children.length > 0 &&
         <CategoriesMenu category={category}/>
         }
         {scripts.map((s) => {
-            return <ScriptReader key={s.id} script={s}/>
+            return <ScriptReader key={s.id} script={s}
+                                 resourcesPrefix="http://magireco.hajinomura.fun/resources/main_story/ch7/ep10/"/>
         })}
     </div>
 });
@@ -46,9 +57,16 @@ export default ReaderScreen
 
 interface ScriptReaderProps {
     script: Script,
+    resourcesPrefix?: string
+    imagesExt?: string
 }
 
 class ScriptReader extends React.Component<ScriptReaderProps, {}> {
+
+    static defaultProps = {
+        resourcesPrefix: "",
+        imagesExt: ".jpg"
+    };
 
     htmlInsertRef = React.createRef<HTMLDivElement>();
 
@@ -62,8 +80,10 @@ class ScriptReader extends React.Component<ScriptReaderProps, {}> {
 
         return <div className={"script_reader"}>
             {this.props.script.title &&
-            <div className={"title"}>
-                {this.props.script.title}
+            <div className={"battle_devider"}>
+                <hr/>
+                <span>{this.props.script.title}</span>
+                <hr/>
             </div>
             }
             <div className={"story"} id={insertIntoId} ref={this.htmlInsertRef}/>
@@ -71,9 +91,31 @@ class ScriptReader extends React.Component<ScriptReaderProps, {}> {
     }
 
     componentDidMount(): void {
+        if (!this.props.script.html) return;
+        const jq = $(this.props.script.html);
+        if (this.props.resourcesPrefix) {
+            jq.find('.image img').each((i, e) => {
+                const $el = $(e);
+                let target = $el.attr('src');
+                if (!target || (target.startsWith('http') || target.startsWith('/'))) {
+                    return;
+                }
+                if (target.startsWith("./")) {
+                    target = target.substr(2)
+                }
+                if (!target.match(/.+\.(png|jpg)$/)) {
+                    target = target + this.props.imagesExt
+                }
+                let pref = this.props.resourcesPrefix || "";
+                if (!pref.endsWith('/')) {
+                    pref = pref + "/"
+                }
+                $el.attr('src', pref + target)
+            });
+        }
         const c = this.htmlInsertRef.current;
         if (c) {
-            c.innerHTML = this.props.script.html;
+            c.innerHTML = jq[0].innerHTML;
         }
     }
 }
@@ -90,4 +132,28 @@ const CategoriesMenu = ({category}: { category: Category }) => {
             })}
         </div>
     </div>
+};
+
+const CategoryHeader = ({title, subtitle = ""}: { title: string, subtitle?: string }) => {
+
+    if (subtitle) {
+        if (!subtitle.match(/.+[.!?;)~]$/)) {
+            subtitle = subtitle + "."
+        }
+        if (subtitle.trimEnd().length === subtitle.length) {
+            subtitle = subtitle + " "
+        }
+    }
+
+    return <div className="top_title">
+      <span className="text">
+          {subtitle}{title}
+      </span>
+    </div>
+};
+
+const TopNav = ({name = "Back", to, params = {}}: { name?: string, to: string, params?: any }) => {
+    return <NavLink to={to} params={params}>
+        <div className="menu"><span>{name}</span></div>
+    </NavLink>
 };
