@@ -84,13 +84,13 @@ class App extends Component {
                 <div className="top app-container">
                     <ContentArea/>
                 </div>
-                <DevTools
+                {process.env.NODE_ENV === 'development' && <DevTools
                     position={
                         {
                             top: -2,
                             right: 200,
                         }}
-                />
+                />}
                 <NotificationSystem ref={(ref: NotificationSystem.System) => notificationService.setRef(ref)}/>
             </React.Fragment>
         );
