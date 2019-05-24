@@ -81,12 +81,14 @@ interface SyncSelectorProps<T> {
 export const SyncSelector = observer(<T extends any>(props: SyncSelectorProps<T>) => {
     const {options, state} = props;
     const classes = classNames(props.className, "app form-component");
-    return <Dropdown selection
+    return <div>
+        <FieldLabel label={props.label}/>
+        <Dropdown selection
                      className={classes}
                      options={options}
                      value={state.value as any}
                      onChange={(e, {value}) => state.onChange(value as any)}
-    />
+    /></div>
 
 });
 

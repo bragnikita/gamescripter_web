@@ -1,4 +1,4 @@
-import React, {useCallback} from 'react';
+import React from 'react';
 import {observer} from "mobx-react-lite";
 import {Script} from "../../stores/scripts";
 import {getStore} from "../../stores/root";
@@ -10,7 +10,6 @@ import {Category} from "../../stores/categories";
 import _ from "lodash";
 import {NavButton, NavLink} from "../widgets/buttons";
 import {CategoryButton} from "./menu";
-import AppServices from "../../services";
 import $ from 'jquery';
 
 const ReaderScreen = observer((props: any) => {
@@ -48,20 +47,20 @@ const ReaderScreen = observer((props: any) => {
         }
         {scripts.map((s) => {
             return <ScriptReader key={s.id} script={s}
-                                 resourcesPrefix="http://magireco.hajinomura.fun/resources/main_story/ch7/ep10/"/>
+                                 resourcesPrefix={category.resources_prefix || category.defaultResourcesPrefix}/>
         })}
     </div>
 });
 
 export default ReaderScreen
 
-interface ScriptReaderProps {
+export interface ScriptReaderProps {
     script: Script,
     resourcesPrefix?: string
     imagesExt?: string
 }
 
-class ScriptReader extends React.Component<ScriptReaderProps, {}> {
+export class ScriptReader extends React.Component<ScriptReaderProps, {}> {
 
     static defaultProps = {
         resourcesPrefix: "",
@@ -90,7 +89,11 @@ class ScriptReader extends React.Component<ScriptReaderProps, {}> {
         </div>
     }
 
-    componentDidMount(): void {
+    componentDidUpdate(): void {
+        this.insert()
+    }
+
+    insert(): void {
         if (!this.props.script.html) return;
         const jq = $(this.props.script.html);
         if (this.props.resourcesPrefix) {
@@ -103,7 +106,7 @@ class ScriptReader extends React.Component<ScriptReaderProps, {}> {
                 if (target.startsWith("./")) {
                     target = target.substr(2)
                 }
-                if (!target.match(/.+\.(png|jpg)$/)) {
+                if (!target.match(/.+\.(png|jpg|jpeg)$/)) {
                     target = target + this.props.imagesExt
                 }
                 let pref = this.props.resourcesPrefix || "";
@@ -117,6 +120,10 @@ class ScriptReader extends React.Component<ScriptReaderProps, {}> {
         if (c) {
             c.innerHTML = jq[0].innerHTML;
         }
+    }
+
+    componentDidMount(): void {
+        this.insert();
     }
 }
 

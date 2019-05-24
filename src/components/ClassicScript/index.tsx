@@ -3,12 +3,13 @@ import {observer} from "mobx-react";
 import {Button, Segment} from "semantic-ui-react";
 import AceEditor from 'react-ace';
 import {getStore} from "../../stores/root";
-import {ClassicScriptStore} from "../../stores/scripts";
+import {ClassicScriptStore, Script} from "../../stores/scripts";
 import "./styles.scss";
 import 'brace/theme/github';
 import {SyncSelector, TextField} from "../widgets/formstate_components";
-import {reaction} from "mobx";
+import {observable, reaction} from "mobx";
 import {NavButton} from "../widgets/buttons";
+import {ScriptReader} from "../Reader";
 
 
 @observer
@@ -19,15 +20,15 @@ export default class EditorScreen extends React.Component<{}, {}> {
     constructor(props: any) {
         super(props);
         this.store = getStore().classic_scripts;
-        reaction(() => this.store.previewHtml, (html) => {
-            if (!this.previewInsert.current) return;
-            if (html) {
-                console.log('inserting html', html.substr(0, 50));
-                this.previewInsert.current.innerHTML = html;
-            } else {
-                this.previewInsert.current.innerHTML = '';
-            }
-        }, {name: 'preview update'})
+        // reaction(() => this.store.previewHtml, (html) => {
+        //     if (!this.previewInsert.current) return;
+        //     if (html) {
+        //         console.log('inserting html', html.substr(0, 50));
+        //         this.previewInsert.current.innerHTML = html;
+        //     } else {
+        //         this.previewInsert.current.innerHTML = '';
+        //     }
+        // }, {name: 'preview update'})
     }
 
     render() {
@@ -82,10 +83,7 @@ export default class EditorScreen extends React.Component<{}, {}> {
                     />
                 </div>
                 <div className="__preview">
-                    <div className="story"
-                         ref={this.previewInsert}
-                         style={{display: this.store.previewHtml ? 'block' : 'none'}}
-                    />
+                    <ScriptReader script={this.store.preview} imagesExt="jpg" resourcesPrefix={this.store.resources_prefix}/>
                 </div>
             </Segment>
             <Segment className="block-attachments">

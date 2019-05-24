@@ -47,6 +47,10 @@ export class Category {
         }
         this.story_type = this.meta.story_type;
         this.children.forEach((c) => c.validate());
+    };
+
+    get defaultResourcesPrefix() {
+        return "http://files.magireco-story.hajinomura.fun/images/"
     }
 }
 
@@ -58,6 +62,7 @@ type CategoryForm = {
     story_type: FieldState<string>;
     index: FieldState<number>;
     slug: FieldState<string>;
+    resources_prefix: FieldState<string>;
 
 }
 
@@ -80,6 +85,7 @@ export class CategoryEditorStore {
             story_type: new FieldState(model.story_type || 'chara'),
             slug: new FieldState(model.slug),
             index: new FieldState(model.index),
+            resources_prefix: new FieldState(model.resources_prefix || model.defaultResourcesPrefix),
         });
         this.model = model;
         this.status = new FormStatus();
@@ -96,6 +102,7 @@ export class CategoryEditorStore {
         c.description = $.description.$;
         c.subtitle = $.subtitle.$;
         c.content_type = $.content_type.$;
+        c.resources_prefix = $.resources_prefix.$;
         c.meta = {};
         c.meta.story_type = c.content_type === 'story' ? $.story_type.$ : null;
         if (this.model.id) {

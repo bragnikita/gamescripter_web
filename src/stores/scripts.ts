@@ -1,12 +1,13 @@
 import {FieldState, FormState} from "formstate";
 import {observable, runInAction} from "mobx";
-import {ScriptsApi} from "../api/resource_apis";
+import {CategoriesApi, ScriptsApi} from "../api/resource_apis";
 import AppServices from "../services";
 import {StatusCatcher, Value} from "./types";
 import {BACK_END_URL} from "../settings";
 import {getStore} from "./root";
 import {inspect} from "util";
 import {required} from "../utils/validators";
+import App from "../App";
 
 export class Script {
     id: string = '';
@@ -40,6 +41,8 @@ export class ClassicScriptStore {
     @observable previewHtml: string | undefined = undefined;
     @observable form!: FormState<EditorState>;
     private api: ScriptsApi;
+    resources_prefix: string = "";
+    @observable preview = new Script();
 
     constructor() {
         this.api = new ScriptsApi(AppServices.http);
@@ -81,7 +84,9 @@ export class ClassicScriptStore {
             });
         });
         runInAction(() => {
-            this.previewHtml = html
+            this.preview = new Script();
+            this.preview.title = this.form.$.title.$;
+            this.preview.html = html;
         })
     };
 
@@ -99,9 +104,11 @@ export class ClassicScriptStore {
                 AppServices.location.replace('categories');
                 return
             }
+            this.resources_prefix = forCategory.existed.resources_prefix;
             this.script.value.category_id = forCategory.existed.id;
         }
         this.script.value.title = new Date().toISOString();
+        this.preview = new Script();
         this.setForm(this.script.value)
     };
 
@@ -112,6 +119,9 @@ export class ClassicScriptStore {
         script.fromJson(s);
         this.script.value = script;
         this.setForm(script);
+        const cat = await new CategoriesApi(AppServices.http).fetch(script.category_id);
+        this.preview = new Script();
+        this.resources_prefix = cat.resources_prefix;
     };
 
     onRemove = async (id: string) => {

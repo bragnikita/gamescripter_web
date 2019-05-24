@@ -50,6 +50,7 @@ const CategoryEditor = observer((props: any) => {
                 <SyncSelector label={"Story"} state={form.$.story_type} options={store.getDict('story_types')}/>
                 }
             </div>
+            <TextField name="res_pref" label={"Images uri prefix"} fieldState={form.$.resources_prefix}/>
         </Form>
         <div className={"app form-buttons"}>
             <Button primary onClick={() => store.save()} disabled={store.editorStore.form.hasError}>Save</Button>
