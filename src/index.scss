@@ -22,6 +22,10 @@ code {
   @extend .prevent-top-collapsing;
 }
 
+.top.app-container {
+  height: 100%;
+}
+
 .app {
   &.form-inline {
     display: flex;

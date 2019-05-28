@@ -2,25 +2,12 @@ import React from "react";
 import AdminHeader from "../AdminHeader";
 import './styles.scss';
 import {observer} from "mobx-react";
-import defaultRoutesDefs from "../../routes";
 import {getStore} from "../../stores/root";
 import {screenMargins} from "../widgets/screens";
 import {CenteredLoader} from "../widgets/loaders";
 
 const ContentAreaCenter = observer((props: any) => {
-    const currentRoute = getStore().ui.activatedRoute;
-    console.log("trying to display: ");
-    console.log(currentRoute);
-    if (!currentRoute) return null;
-    let route = defaultRoutesDefs.map[currentRoute ? currentRoute.name : 'not_found'];
-    if (!route) {
-        return <div>Route not found</div>
-    }
-    const listener = route.listener;
-    if (listener && listener.comp) {
-        return listener.comp;
-    }
-    return <div>No component for route {route.name} ({route.path})</div>
+    return null;
 });
 
 @observer

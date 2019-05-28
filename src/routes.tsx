@@ -1,45 +1,55 @@
-import React from "react";
-import categories from './components/Categories/routes';
-import users from './components/Users/routes';
-import login from './components/Login/routes';
-import reader from './components/Reader/routes';
-import classic_scripts from './components/ClassicScript/routes';
-import {AppRoute, AppRoutingMap, ScreenRoute} from "./types";
+import React from 'react';
+import {Router} from "router5";
+import {AppNavigationConfig, AuthControlMiddleware} from "./routing";
+import {timeout} from "./components/main";
 
-class RoutesMap implements AppRoutingMap{
-    map: {[key: string]: ScreenRoute} = {};
+const authControlMiddlewareInstance = new AuthControlMiddleware();
 
-    add = (routes: ScreenRoute[]) => {
-        routes.forEach((r) => {
-            this.map[r.name] = r;
-        })
-    }
-}
+authControlMiddlewareInstance.publicRoutes = ['sign_in', 'sign_up', 'not_found'];
+authControlMiddlewareInstance.redirectIfUnauth = 'sign_in';
+authControlMiddlewareInstance.publicOnlyRoutes = ['sign_in', 'sign_up'];
+authControlMiddlewareInstance.redirectIfAuth = 'home';
+authControlMiddlewareInstance.isLoggedIn = () => timeout(10, true);
 
-const map = new RoutesMap();
+export const authControlMiddleware = authControlMiddlewareInstance;
 
-const defaultRoutesDefs = [
-    { name: 'home', path: '/', listener: {redirectTo: 'categories'}},
-    { name: 'not_found', path: '/not_found'},
-    { name: 'users', path: '/users' },
-    { name: 'posting', path: '/posting' },
-    { name: 'categories', path: '/categories' },
-    { name: 'category', path: '/category'},
-    { name: 'category.id', path: '/:id'}
-];
+export const configure = (router: Router) => {
 
-map.add(defaultRoutesDefs);
-map.add(categories);
-map.add(users);
-map.add(login);
-map.add(classic_scripts);
-map.add(reader);
+    const cfg = new AppNavigationConfig(router);
 
-export const publicRoutes = () => {
-  return [
-      'login', 'reader', 'not_found'
-  ]
+    cfg.addFallbackScreen({
+        render: (state) => <div>404 Not found </div>
+    });
+
+    cfg.addRoute({name: 'home', path: '/home'}).withScreen({
+        before: async () => await timeout(1000, {}),
+        render: () => <div>Home</div>
+    });
+
+    cfg.addRoute({name: 'sign_in', path: '/sign_in'}).withScreen({
+        render: () => <div>Sign in</div>
+    }).withOptions({layout: 'public'});
+
+    cfg.addRoute({name: 'sign_up', path: '/sign_up'}).withScreen({
+        render: () => <div>Sign up</div>
+    }).withOptions({layout: 'public'});
+
+    cfg.addRoute({name: 'category', path: '/category'}).withScreen({
+        render: () => <div>Categories</div>
+    });
+
+    cfg.addRoute({name: 'category.one', path: '/:id'}).withScreen({
+        render: (state) => <div>Category {state.params['id']}</div>
+    });
+
+    cfg.addRoute({name: 'script', path: '/script'});
+    cfg.addRoute({name: 'script.new', path: '/new?:category'});
+    cfg.addRoute({name: 'script.edit', path: '/:id'});
+    cfg.addRoute({name: 'settings', path: '/settings'});
+
+    cfg.addRoute({name: 'not_found', path: '/not_found'}).withScreen({
+        render: () => <div>Not found</div>
+    }).withOptions({layout: 'public'});
+
+    return cfg;
 };
-
-
-export default map;

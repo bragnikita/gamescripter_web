@@ -1,76 +1,99 @@
-import {AppRoutingMap} from "./types";
-import {createRouter, Middleware, Router, State, transitionPath} from "router5";
-import browserPlugin from "router5-plugin-browser";
-import {DoneFn} from "router5/types/types/base";
-import {UiState} from "./stores/uistate";
-import _ from 'lodash';
-import {publicRoutes} from "./routes";
-import {getStore} from "./stores/root";
+import {Route, Router, State} from "router5";
+import {ReactNode} from "react";
+import {timeout} from "./components/main";
 
-export const createTransitionMiddlewareFactory = (routes: AppRoutingMap, store: UiState) => {
-    return (router: Router): Middleware => {
-        return async (toState: State, fromState: State, done: DoneFn) => {
-            console.log('next', toState)
-            const prevParams = (fromState || {}).params || {};
-            const nextParams = toState.params || {};
-            const prevRoute = routes.map[(fromState || {}).name];
-            const nextRoute = routes.map[toState.name];
-            if (prevRoute && prevRoute.listener && prevRoute.listener.deactivate) {
-                await prevRoute.listener.deactivate(prevParams, toState);
-            }
-            if (nextRoute.listener && nextRoute.listener.redirectTo) {
-                throw {redirect: {name: nextRoute.listener.redirectTo }}
-            }
-            store.route = toState;
-            if (nextRoute.listener && nextRoute.listener.activate) {
-                await nextRoute.listener.activate(nextParams, fromState);
-            }
-            store.setActivatedRoot(toState);
-            return toState;
-        }
-    }
-};
 
-export class AccessControlMiddleware {
 
-    createMiddleware = (router: Router):Middleware => {
 
-        const store = getStore().account;
 
-        return async (toState, fromState, done) => {
-            let path = transitionPath(toState, fromState);
-            console.log("trying next state ", toState.name);
-            console.log(path);
-            console.log(publicRoutes());
-            console.log(_.intersection([path.intersection, ...path.toActivate], publicRoutes()));
-            const privateRoute = _.intersection([path.intersection, ...path.toActivate], publicRoutes()).length == 0;
-            if (privateRoute && !store.isLoggedIn) {
-                const res = await getStore().ui.applicationInitState.catchIt(() => {
-                   return store.tryStart();
-                });
-                if (!res) {
-                    const redirectTo = router.buildUrl(toState.name, toState.params);
-                    throw {redirect: {name: 'login', params: { returnTo: redirectTo }}}
-                } else {
-                    return toState;
+export class AuthControlMiddleware {
+    publicRoutes: string[] = [];
+    publicOnlyRoutes: string[] = [];
+    redirectIfUnauth: string | undefined = undefined;
+    redirectIfAuth: string | undefined = undefined;
+    isLoggedIn: () => Promise<boolean> = () => Promise.resolve(true)
+
+    middlewareFactory = (router: Router) => async (toState: State) => {
+        const loggedIn = await this.isLoggedIn();
+        if (loggedIn) {
+            if (this.redirectIfAuth) {
+                if (this.publicOnlyRoutes.includes(toState.name)) {
+                    throw {redirect: {name: this.redirectIfAuth}}
                 }
-            } else {
-                return toState;
             }
-
+        } else {
+            if (this.redirectIfUnauth) {
+                if (!(this.publicRoutes.includes(toState.name))) {
+                    throw {redirect: {name: this.redirectIfUnauth, params: {returnTo: toState.path}}}
+                }
+            }
         }
     }
 }
 
-export const makeMobxRouter = (routes: AppRoutingMap) => {
-    const router = createRouter(Object.values(routes.map),
-        {
-            queryParamsMode: "loose",
-            allowNotFound: false,
-            defaultRoute: 'not_found',
+
+
+export interface Screen {
+    before?: (to: State) => any;
+    render: (to: State) => ReactNode;
+}
+
+export class AppNavigationConfig {
+
+    router: Router;
+    map: Map<String, RouteConfig> = new Map();
+    private fallback: Screen | undefined = undefined;
+
+    constructor(router: Router) {
+        this.router = router;
+    }
+
+    addRoute(route: Route) {
+        this.router.add(route);
+        const conf = new RouteConfig(route);
+        this.map.set(route.name, conf);
+        return conf;
+    }
+
+    addFallbackScreen(s: Screen) {
+        this.fallback = s;
+    }
+
+    getConfig = (routeName: string) => {
+        return this.map.get(routeName);
+    };
+
+    getFallbackScreen = () => this.fallback
+}
+
+export class RouteConfig {
+    route: Route;
+    screen: Screen | undefined = undefined;
+    options: Options = {};
+    beforeCallback: (to: State) => any = () => {
+    };
+
+    constructor(r: Route) {
+        this.route = r;
+    }
+
+    withBeforeCallback = (callback: (to: State) => any) => {
+        this.beforeCallback = callback;
+        return this;
+    };
+    withScreen = (screen: Screen) => {
+        this.screen = screen;
+        if (screen.before) {
+            this.beforeCallback = screen.before
         }
-    );
-    router.usePlugin(browserPlugin());
-    router.subscribe(state => console.log(state));
-    return router;
-};
+        return this;
+    };
+    withOptions = (o: Options) => {
+        Object.assign(this.options, o);
+        return this;
+    }
+}
+
+interface Options {
+    layout?: string,
+}
