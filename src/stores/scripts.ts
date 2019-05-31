@@ -1,7 +1,7 @@
 import {FieldState, FormState} from "formstate";
 import {observable, runInAction} from "mobx";
 import {CategoriesApi, ScriptsApi} from "../api/resource_apis";
-import AppServices from "../services";
+import AppServices from "../services_v0";
 import {StatusCatcher, Value} from "./types";
 import {BACK_END_URL} from "../settings";
 import {getStore} from "./root";

@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import {Button, ButtonProps} from "semantic-ui-react";
-import AppServices from "../../services";
+import AppServices from "../../services_v0";
 import {getStore} from "../../stores/root";
 import {State} from "router5";
 

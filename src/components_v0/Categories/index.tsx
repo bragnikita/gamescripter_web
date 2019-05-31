@@ -6,7 +6,7 @@ import CategoriesStore, {Category} from "../../stores/categories";
 import {CenteredLoader} from "../widgets/loaders";
 import {Button, Divider, Form, Label, Segment} from "semantic-ui-react";
 import {SyncSelector, TextArea, TextField} from "../widgets/formstate_components";
-import AppServices from "../../services";
+import AppServices from "../../services_v0";
 import {DictionaryValue} from "../widgets/dictionaries";
 import {NavButton} from "../widgets/buttons";
 

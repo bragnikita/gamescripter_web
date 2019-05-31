@@ -1,17 +1,13 @@
 import {Route, Router, State} from "router5";
 import {ReactNode} from "react";
-import {timeout} from "./components/main";
-
-
-
-
+import {RootStore} from "./state/root_store";
 
 export class AuthControlMiddleware {
     publicRoutes: string[] = [];
     publicOnlyRoutes: string[] = [];
     redirectIfUnauth: string | undefined = undefined;
     redirectIfAuth: string | undefined = undefined;
-    isLoggedIn: () => Promise<boolean> = () => Promise.resolve(true)
+    isLoggedIn: () => Promise<boolean> = () => Promise.resolve(false);
 
     middlewareFactory = (router: Router) => async (toState: State) => {
         const loggedIn = await this.isLoggedIn();
@@ -28,6 +24,12 @@ export class AuthControlMiddleware {
                 }
             }
         }
+    }
+}
+
+export function storeConnectorFactory(g: () => RootStore) {
+    return (router: Router) => async (toState: State) => {
+        g().ui.beforePageChanges(toState)
     }
 }
 

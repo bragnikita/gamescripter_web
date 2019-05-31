@@ -7,7 +7,7 @@ import {Exclude, Expose, Type} from "class-transformer";
 import {jsonToClassSingle} from "../utils/serialization";
 import {getStore} from "./root";
 import {required} from "../utils/validators";
-import AppServices from "../services";
+import AppServices from "../services_v0";
 
 @Exclude()
 export class Category {
@@ -37,6 +37,10 @@ export class Category {
     index: number = -1;
     @Expose()
     resources_prefix: string = "";
+    @Expose()
+    status: string = "";
+    @Expose()
+    contributors: string[] = [];
 
     validate = () => {
         if (!this.children) {
@@ -51,6 +55,10 @@ export class Category {
 
     get defaultResourcesPrefix() {
         return "http://files.magireco-story.hajinomura.fun/images/"
+    }
+
+    get isNew() {
+        return !!this.id;
     }
 }
 

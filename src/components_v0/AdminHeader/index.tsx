@@ -1,7 +1,7 @@
 import React from "react";
 import {Container, Dropdown, Icon, Label, Menu} from "semantic-ui-react";
 import {observer} from "mobx-react-lite";
-import AppServices from "../../services";
+import AppServices from "../../services_v0";
 import {getStore} from "../../stores/root";
 
 

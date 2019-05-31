@@ -1,18 +1,16 @@
-import React, {ReactNode, useEffect, useLayoutEffect, useRef, useState} from 'react';
-import {useRoute} from "react-router5";
+import React, {useLayoutEffect, useRef, useState} from 'react';
 import {AppNavigationConfig, RouteConfig} from "../routing";
 import {State} from "router5";
 import {CenteredLoader} from "../components_v0/widgets/loaders";
-import {PrivateLayout} from "./layouts";
+import {PrivateLayout, PublicLayout} from "./layouts";
+import {observer} from "mobx-react";
+import {store} from "../service";
 
-export const Main = ({cfg}: { cfg: AppNavigationConfig }) => {
-
-    const {route} = useRoute();
-
+export const Main = observer(({cfg}: { cfg: AppNavigationConfig }) => {
+    const route = store().ui.currentScreenState;
     if (!route) {
         return <CenteredLoader global/>;
     }
-
 
     const config = cfg.getConfig(route.name);
 
@@ -28,14 +26,14 @@ export const Main = ({cfg}: { cfg: AppNavigationConfig }) => {
 
     const layout = config.options.layout || "default";
     if (layout === 'public') {
-        return <div className="public_layout">
+        return <PublicLayout>
             <ScreenRenderer r={config} s={route}/>
-        </div>
+        </PublicLayout>
     }
     return <PrivateLayout>
         <ScreenRenderer r={config} s={route}/>
     </PrivateLayout>;
-};
+});
 
 const ScreenRenderer = ({r, s}: { r: RouteConfig, s: State }) => {
 

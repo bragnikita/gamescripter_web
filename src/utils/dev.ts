@@ -23,11 +23,11 @@ class DevDelegate {
 
     private allow(action: Action) {
         let permissionsStr: string | null = "";
-        if (window.localStorage) {
-            permissionsStr = window.localStorage.getItem("dev");
+        if (process.env.NODE_ENV === 'development') {
+            permissionsStr = ['console', 'devtools', 'expose_global'].join(',')
         } else {
-            if (process.env.NODE_ENV === 'development') {
-                permissionsStr = ['console', 'devtools', 'expose_global'].join(',')
+            if (window.localStorage) {
+                permissionsStr = window.localStorage.getItem("dev");
             }
         }
         if (permissionsStr) {

@@ -81,8 +81,7 @@ code {
   }
 
   &.form-error {
-    min-height: 1.2em;
-    font-size: 16px;
+    font-size: 14px;
   }
 }
 
@@ -115,6 +114,9 @@ code {
       &:last-child {
         margin-right: 0;
       }
+    }
+    &.center {
+      justify-content: center;
     }
     &.left {
       justify-content: flex-start;

@@ -1,14 +1,18 @@
 import {action, observable, runInAction} from "mobx";
-import {DictionariesApi} from "../api/resource_apis";
-import AppServices from "../services_v0";
 import {plainToClass, Type} from "class-transformer";
-import {TextValuePair} from "./types";
+import {TextValuePair} from "../stores/types";
+import {RootStore} from "./root_store";
+import {http} from "../service";
 
 class Dictionary {
     name: string = '';
     title: string = '';
     @Type(() => DictionaryRecord)
     records: DictionaryRecord[] = [];
+
+    getAsDropdownOptions = (): TextValuePair[] => {
+        return this.records.map((d) => ({text: d.title, value: d.parameter, key: d.parameter}))
+    }
 }
 
 class DictionaryRecord {
@@ -17,6 +21,8 @@ class DictionaryRecord {
 }
 
 export class DictionariesStore {
+    root: RootStore;
+
     story_types: Dictionary = new Dictionary();
     category_types: Dictionary = new Dictionary();
     script_types: Dictionary = new Dictionary();
@@ -26,16 +32,14 @@ export class DictionariesStore {
     @observable loading = false;
     @observable initialized = false;
 
-    api: DictionariesApi;
-
-    constructor() {
-        this.api = new DictionariesApi(AppServices.http);
+    constructor(root: RootStore) {
+        this.root = root;
     }
 
     @action preLoad = async () => {
         this.loading = true;
         try {
-            const json = await this.api.getAll();
+            const { response: json } = await http().client.getJson('/dictionaries');
             const dicts = plainToClass(Dictionary, json);
             dicts.forEach((d) => {
                 switch (d.name) {
@@ -57,11 +61,7 @@ export class DictionariesStore {
         }
     };
 
-    getAsDropdownOptions = (name: string): TextValuePair[] => {
-        const d = this.all.get(name);
-        if (!d) {
-            return []
-        }
-        return d.records.map((d) => ({text: d.title, value: d.parameter, key: d.parameter}))
+    getSync = (name: string ) => {
+        return this.all.get(name);
     }
 }

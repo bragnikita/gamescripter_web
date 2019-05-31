@@ -1,5 +1,5 @@
 import React, {useState} from "react";
-import {Checkbox, Dropdown, DropdownItemProps, Input, TextArea as Text} from "semantic-ui-react";
+import {Checkbox, Dropdown, DropdownItemProps, DropdownProps, Input, TextArea as Text} from "semantic-ui-react";
 import {FieldState} from "formstate";
 import {observer} from "mobx-react-lite";
 import './formstate_components.scss';
@@ -22,9 +22,13 @@ export const TextField = observer(({
                                        placeholder
                                    }: TextFieldProps) => {
     return <div className={classNames('app form-component textfield', wrapperClass)}>
-        <FieldLabel label={label} required={required}/>
+        <div className="app hlist-container">
+            <FieldLabel label={label} required={required}/>
+            <FieldError state={fieldState} displayError={displayErrors}/>
+        </div>
         <Input type={password ? 'password' : 'text'}
                fluid
+               size="mini"
                placeholder={placeholder}
                required={required}
                error={fieldState.hasError && displayErrors}
@@ -32,7 +36,6 @@ export const TextField = observer(({
                value={fieldState.value}
                onChange={(e, data) => fieldState.onChange(data.value)}
         />
-        <FieldError state={fieldState} displayError={displayErrors}/>
     </div>
 });
 
@@ -69,26 +72,23 @@ export const Toggle = observer(({state, label, ...props}: {
     />
 });
 
-interface SyncSelectorProps<T> {
-    options: DropdownItemProps[],
+interface SyncSelectorProps<T> extends DropdownProps {
     state: FieldState<any>,
     label?: string,
-    className?: string,
-
-    [key: string]: any
 }
 
 export const SyncSelector = observer(<T extends any>(props: SyncSelectorProps<T>) => {
-    const {options, state} = props;
-    const classes = classNames(props.className, "app form-component");
-    return <div>
+    const {options, state, className, loading = false, ...rest} = props;
+    const classes = classNames(className, "app form-component");
+    return <div className={classes}>
         <FieldLabel label={props.label}/>
         <Dropdown selection
-                     className={classes}
-                     options={options}
-                     value={state.value as any}
-                     onChange={(e, {value}) => state.onChange(value as any)}
-    /></div>
+                  {...rest}
+                  loading={loading}
+                  options={options}
+                  value={state.value as any}
+                  onChange={(e, {value}) => state.onChange(value as any)}
+        /></div>
 
 });
 

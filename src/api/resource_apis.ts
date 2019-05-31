@@ -1,6 +1,6 @@
 import {ApiError, HttpClient} from "../types";
 import {inspect} from "util";
-import AppServices from "../services";
+import AppServices from "../services_v0";
 import {async} from "q";
 
 class Base {

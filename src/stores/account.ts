@@ -1,7 +1,7 @@
 import {FieldState, FormState} from "formstate";
 import {required} from "../utils/validators";
 import {action, computed, observable, runInAction} from "mobx";
-import AppServices from "../services";
+import AppServices from "../services_v0";
 import {AccountApi} from "../api/resource_apis";
 import {HttpClient} from "../types";
 import {getStore} from "./root";
